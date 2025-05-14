@@ -21,7 +21,7 @@ services:
       - content-service
       - ai-service
     networks:
-      - aut note-network
+      - autonote-network
 
   # Auth Service
   auth-service:
@@ -42,7 +42,7 @@ services:
       - db
       - redis
     networks:
-      - aut note-network
+      - autonote-network
 
   # Note Service
   note-service:
@@ -62,7 +62,7 @@ services:
       - redis
       - auth-service
     networks:
-      - aut note-network
+      - autonote-network
 
   # Content Service
   content-service:
@@ -82,7 +82,7 @@ services:
       - redis
       - auth-service
     networks:
-      - aut note-network
+      - autonote-network
 
   # AI Service
   ai-service:
@@ -103,7 +103,7 @@ services:
       - redis
       - auth-service
     networks:
-      - aut note-network
+      - autonote-network
 
   # Frontend
   frontend:
@@ -132,7 +132,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
     networks:
-      - aut note-network
+      - autonote-network
 
   # Redis
   redis:
@@ -142,7 +142,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - aut note-network
+      - autonote-network
 
   # RabbitMQ
   rabbitmq:
@@ -172,19 +172,19 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
-      - aut note-network
+      - autonote-network
 
   # Grafana
   grafana:
     image: grafana/grafana:8.2.0
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
     networks:
-      - aut note-network
+      - autonote-network
 
 volumes:
   postgres_data:
@@ -195,5 +195,5 @@ volumes:
   grafana_data:
 
 networks:
-  aut note-network:
+  autonote-network:
     driver: bridge 

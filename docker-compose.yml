@@ -9,8 +9,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - ENVIRONMENT=development
-      - DEBUG=true
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - NOTE_SERVICE_URL=http://note-service:8002
+      - CONTENT_SERVICE_URL=http://content-service:8003
+      - AI_SERVICE_URL=http://ai-service:8004
     volumes:
       - ./services/api-gateway:/app
     depends_on:
@@ -18,6 +20,8 @@ services:
       - note-service
       - content-service
       - ai-service
+    networks:
+      - aut note-network
 
   # Auth Service
   auth-service:
@@ -27,15 +31,18 @@ services:
     ports:
       - "8001:8001"
     environment:
-      - ENVIRONMENT=development
-      - DEBUG=true
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/autonote_auth
+      - DATABASE_URL=postgresql://user:password@db:5432/auth_db
       - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET=your-secret-key
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
     volumes:
       - ./services/auth-service:/app
     depends_on:
       - db
       - redis
+    networks:
+      - aut note-network
 
   # Note Service
   note-service:
@@ -45,15 +52,17 @@ services:
     ports:
       - "8002:8002"
     environment:
-      - ENVIRONMENT=development
-      - DEBUG=true
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/autonote_notes
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - DATABASE_URL=postgresql://user:password@db:5432/note_db
+      - REDIS_URL=redis://redis:6379/0
+      - AUTH_SERVICE_URL=http://auth-service:8001
     volumes:
       - ./services/note-service:/app
     depends_on:
       - db
-      - elasticsearch
+      - redis
+      - auth-service
+    networks:
+      - aut note-network
 
   # Content Service
   content-service:
@@ -63,15 +72,17 @@ services:
     ports:
       - "8003:8003"
     environment:
-      - ENVIRONMENT=development
-      - DEBUG=true
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/autonote_content
-      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - DATABASE_URL=postgresql://user:password@db:5432/content_db
+      - REDIS_URL=redis://redis:6379/0
+      - AUTH_SERVICE_URL=http://auth-service:8001
     volumes:
       - ./services/content-service:/app
     depends_on:
       - db
-      - rabbitmq
+      - redis
+      - auth-service
+    networks:
+      - aut note-network
 
   # AI Service
   ai-service:
@@ -81,13 +92,18 @@ services:
     ports:
       - "8004:8004"
     environment:
-      - ENVIRONMENT=development
-      - DEBUG=true
-      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - DATABASE_URL=postgresql://user:password@db:5432/ai_db
+      - REDIS_URL=redis://redis:6379/0
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     volumes:
       - ./services/ai-service:/app
     depends_on:
-      - rabbitmq
+      - db
+      - redis
+      - auth-service
+    networks:
+      - aut note-network
 
   # Frontend
   frontend:
@@ -105,16 +121,18 @@ services:
 
   # Database
   db:
-    image: postgres:14
+    image: postgres:13
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_MULTIPLE_DATABASES=autonote_auth,autonote_notes,autonote_content
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_MULTIPLE_DATABASES=auth_db,note_db,content_db,ai_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+      - ./scripts/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
+    networks:
+      - aut note-network
 
   # Redis
   redis:
@@ -123,6 +141,8 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - aut note-network
 
   # RabbitMQ
   rabbitmq:
@@ -146,22 +166,25 @@ services:
 
   # Prometheus
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.30.3
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus:/etc/prometheus
-      - prometheus_data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - aut note-network
 
   # Grafana
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:8.2.0
     ports:
-      - "3001:3000"
+      - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
+    networks:
+      - aut note-network
 
 volumes:
   postgres_data:
@@ -169,4 +192,8 @@ volumes:
   rabbitmq_data:
   elasticsearch_data:
   prometheus_data:
-  grafana_data: 
+  grafana_data:
+
+networks:
+  aut note-network:
+    driver: bridge 

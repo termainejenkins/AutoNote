@@ -1,0 +1,38 @@
+service_name/
+├── alembic/
+│   ├── versions/
+│   └── env.py
+├── app/
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── deps.py
+│   │   └── v1/
+│   │       ├── __init__.py
+│   │       └── endpoints/
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   └── security.py
+│   ├── db/
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   └── session.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── models.py
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   └── schemas.py
+│   └── services/
+│       ├── __init__.py
+│       └── service.py
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py
+│   └── test_api/
+├── .env
+├── .gitignore
+├── alembic.ini
+├── Dockerfile
+├── main.py
+└── requirements.txt 

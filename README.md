@@ -1,86 +1,114 @@
 # AutoNote
 
-AutoNote is an intelligent note-taking application that automatically generates notes for you as you read or study during web browsing, Coursera courses, and video content.
+AutoNote is a comprehensive note-taking and content processing platform that helps users capture, organize, and enhance their notes using AI-powered features.
 
 ## Features
 
-- Automatic note generation from web content
-- Coursera course content integration
-- Video transcription and summarization
-- Browser extension for seamless web content capture
-- Modern web interface for note management
-- AI-powered content summarization
+- **Content Capture**: Capture notes from various sources (web, PDF, video)
+- **AI Enhancement**: Automatic summarization, key point extraction, and question generation
+- **Smart Organization**: Tag-based organization and intelligent search
+- **Multi-platform**: Web interface, browser extension, and desktop application
 
 ## Project Structure
 
 ```
 autonote/
-├── backend/           # FastAPI backend service
-├── frontend/         # React frontend application
-├── browser-extension/ # Chrome extension for web capture
-└── docs/             # Documentation
+├── services/              # Backend microservices
+│   ├── api-gateway/      # API Gateway service
+│   ├── auth-service/     # Authentication service
+│   ├── note-service/     # Note management service
+│   ├── content-service/  # Content processing service
+│   └── ai-service/       # AI processing service
+├── frontend/             # React frontend application
+├── docs/                 # Documentation
+├── scripts/             # Utility scripts
+└── docker-compose.yml   # Docker Compose configuration
 ```
 
-## Setup Instructions
+## Prerequisites
 
-### Prerequisites
+- Docker Desktop for Windows
+- PowerShell 5.1 or later
+- Git
 
-- Python 3.8+
-- Node.js 16+
-- Chrome browser (for extension)
+## Getting Started
 
-### Backend Setup
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
+1. Clone the repository:
+   ```powershell
+   git clone https://github.com/yourusername/autonote.git
+   cd autonote
    ```
 
-2. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+2. Start the services:
+   ```powershell
+   docker-compose up --build -d
    ```
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
+3. Run the test script to verify all services are working:
+   ```powershell
+   .\scripts\test-services.ps1
    ```
 
-4. Start the backend server:
-   ```bash
-   uvicorn main:app --reload
-   ```
+## Service Ports
 
-### Frontend Setup
+- API Gateway: http://localhost:8000
+- Auth Service: http://localhost:8001
+- Note Service: http://localhost:8002
+- Content Service: http://localhost:8003
+- AI Service: http://localhost:8004
+- Grafana: http://localhost:3000
+- Prometheus: http://localhost:9090
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
+## Development
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+### Backend Services
 
-3. Start the development server:
-   ```bash
-   npm start
-   ```
+Each service is built using FastAPI and follows a consistent structure:
+- `main.py`: FastAPI application and endpoints
+- `config.py`: Configuration and environment variables
+- `models.py`: Data models and schemas
+- `Dockerfile`: Container configuration
 
-### Browser Extension Setup
+### Testing
 
-1. Navigate to the browser-extension directory
-2. Load the extension in Chrome:
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked" and select the browser-extension directory
+The project includes automated tests for all services:
+- Unit tests for individual components
+- Integration tests for service interactions
+- End-to-end tests for complete workflows
+
+To run the tests:
+```powershell
+# Run all tests
+.\scripts\test-services.ps1
+
+# Run specific service tests
+.\scripts\test-services.ps1 -Service auth-service
+```
+
+### Monitoring
+
+The project includes Prometheus and Grafana for monitoring:
+- Service health metrics
+- Performance metrics
+- Error tracking
+- Resource usage
+
+Access the monitoring dashboards:
+- Grafana: http://localhost:3000 (admin/admin)
+- Prometheus: http://localhost:9090
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Support
+
+For support, please open an issue in the GitHub repository or contact the development team. 

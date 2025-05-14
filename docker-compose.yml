@@ -1,21 +1,95 @@
 version: '3.8'
 
 services:
-  backend:
-    build: 
-      context: ./backend
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/autonote
+      - ENVIRONMENT=development
+      - DEBUG=true
+    volumes:
+      - ./services/api-gateway:/app
+    depends_on:
+      - auth-service
+      - note-service
+      - content-service
+      - ai-service
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/autonote_auth
       - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./services/auth-service:/app
     depends_on:
       - db
       - redis
 
+  # Note Service
+  note-service:
+    build:
+      context: ./services/note-service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/autonote_notes
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    volumes:
+      - ./services/note-service:/app
+    depends_on:
+      - db
+      - elasticsearch
+
+  # Content Service
+  content-service:
+    build:
+      context: ./services/content-service
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/autonote_content
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    volumes:
+      - ./services/content-service:/app
+    depends_on:
+      - db
+      - rabbitmq
+
+  # AI Service
+  ai-service:
+    build:
+      context: ./services/ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    volumes:
+      - ./services/ai-service:/app
+    depends_on:
+      - rabbitmq
+
+  # Frontend
   frontend:
     build:
       context: ./frontend
@@ -26,8 +100,10 @@ services:
       - ./frontend:/app
       - /app/node_modules
     environment:
+      - NODE_ENV=development
       - REACT_APP_API_URL=http://localhost:8000
 
+  # Database
   db:
     image: postgres:14
     ports:
@@ -35,17 +111,62 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=autonote
+      - POSTGRES_MULTIPLE_DATABASES=autonote_auth,autonote_notes,autonote_content
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
 
+  # Redis
   redis:
-    image: redis:7
+    image: redis:6
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
 
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  # Elasticsearch
+  elasticsearch:
+    image: elasticsearch:7.14.0
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+
+  # Grafana
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
 volumes:
   postgres_data:
-  redis_data: 
+  redis_data:
+  rabbitmq_data:
+  elasticsearch_data:
+  prometheus_data:
+  grafana_data: 

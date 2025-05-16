@@ -51,15 +51,20 @@ export const notesApi = {
     const response = await api.get(`/notes/${id}`);
     return response.data;
   },
-  createNote: async (data: any) => {
+  createNote: async (data: { title: string; content: string; tags?: string[] }) => {
     const response = await api.post('/notes', data);
     return response.data;
   },
-  updateNote: async (id: number, data: any) => {
+  updateNote: async (id: number, data: { title?: string; content?: string; tags?: string[] }) => {
     const response = await api.put(`/notes/${id}`, data);
     return response.data;
   },
   deleteNote: async (id: number) => {
-    await api.delete(`/notes/${id}`);
+    const response = await api.delete(`/notes/${id}`);
+    return response.data;
   },
+  processContent: async (content: string) => {
+    const response = await api.post('/notes/process', { content });
+    return response.data;
+  }
 };

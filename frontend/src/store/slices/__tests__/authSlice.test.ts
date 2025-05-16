@@ -1,25 +1,23 @@
-import { configureStore, AnyAction } from '@reduxjs/toolkit';
-import { ThunkDispatch } from 'redux-thunk';
-import authReducer, { login, register, logout, updateUser } from '../authSlice';
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer, { login, updateUser } from '../authSlice';
 import { authApi } from '../../../services/api';
-import { AuthState } from '../../../types/auth';
+import { AuthState, User } from '../../../types/auth';
 
 // Mock the API
 jest.mock('../../../services/api', () => ({
   authApi: {
     login: jest.fn(),
-    register: jest.fn(),
-    logout: jest.fn(),
     updateUser: jest.fn(),
     updatePassword: jest.fn(),
   }
 }));
 
-type AppDispatch = ThunkDispatch<{ auth: AuthState }, unknown, AnyAction>;
+type RootState = ReturnType<typeof store.getState>;
+type AppDispatch = typeof store.dispatch;
 
 describe('Auth Slice', () => {
   let store: ReturnType<typeof configureStore>;
-  let dispatch: AppDispatch;
+  let appDispatch: AppDispatch;
 
   beforeEach(() => {
     store = configureStore({
@@ -27,7 +25,7 @@ describe('Auth Slice', () => {
         auth: authReducer,
       },
     });
-    dispatch = store.dispatch as AppDispatch;
+    appDispatch = store.dispatch;
   });
 
   afterEach(() => {
@@ -42,9 +40,10 @@ describe('Auth Slice', () => {
 
     const mockResponse = {
       user: {
-        id: '1',
+        id: 1,
         email: 'test@example.com',
         username: 'testuser',
+        created_at: new Date().toISOString(),
       },
       token: 'mock-token',
     };
@@ -52,7 +51,7 @@ describe('Auth Slice', () => {
     it('handles successful login', async () => {
       (authApi.login as jest.Mock).mockResolvedValue(mockResponse);
 
-      await dispatch(login(mockCredentials));
+      await store.dispatch(login(mockCredentials));
       const state = store.getState() as { auth: AuthState };
 
       expect(state.auth.isAuthenticated).toBe(true);
@@ -64,26 +63,36 @@ describe('Auth Slice', () => {
       const errorMessage = 'Invalid credentials';
       (authApi.login as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
-      await dispatch(login(mockCredentials));
+      await store.dispatch(login(mockCredentials));
       const state = store.getState() as { auth: AuthState };
 
       expect(state.auth.isAuthenticated).toBe(false);
       expect(state.auth.user).toBeNull();
       expect(state.auth.error).toContain(errorMessage);
     });
-  });  describe('updateUser action', () => {    const mockUser = {
+  });
+
+  describe('updateUser action', () => {
+    const mockUser: Partial<User> & { id: number } = {
       id: 1,
       username: 'updateduser',
       email: 'updated@example.com',
+      created_at: new Date().toISOString(),
     };
 
     beforeEach(() => {
       store = configureStore({
         reducer: {
           auth: authReducer,
-        },        preloadedState: {
+        },
+        preloadedState: {
           auth: {
-            user: { id: 1, username: 'testuser', email: 'test@example.com', created_at: new Date().toISOString() },
+            user: {
+              id: 1,
+              username: 'testuser',
+              email: 'test@example.com',
+              created_at: new Date().toISOString(),
+            },
             isAuthenticated: true,
             token: 'test-token',
             isLoading: false,
@@ -91,13 +100,12 @@ describe('Auth Slice', () => {
           },
         },
       });
-      dispatch = store.dispatch as AppDispatch;
     });
 
     it('handles successful user update', async () => {
       (authApi.updateUser as jest.Mock).mockResolvedValue(mockUser);
 
-      await dispatch(updateUser(mockUser));
+      await store.dispatch(updateUser({ id: mockUser.id, username: mockUser.username, email: mockUser.email }));
       const state = store.getState() as { auth: AuthState };
 
       expect(state.auth.user).toEqual(mockUser);
@@ -108,7 +116,7 @@ describe('Auth Slice', () => {
       const errorMessage = 'Update failed';
       (authApi.updateUser as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
-      await dispatch(updateUser(mockUser));
+      await store.dispatch(updateUser({ id: mockUser.id, username: mockUser.username, email: mockUser.email }));
       const state = store.getState() as { auth: AuthState };
 
       expect(state.auth.error).toContain(errorMessage);

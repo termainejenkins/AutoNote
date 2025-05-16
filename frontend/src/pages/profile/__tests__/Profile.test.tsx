@@ -9,29 +9,8 @@ import Profile from '../Profile';
 import authReducer from '../../../store/slices/authSlice';
 import notesReducer from '../../../store/slices/notesSlice';
 
-const mockStore = configureStore({
-  reducer: {
-    auth: authReducer,
-    notes: notesReducer,
-  },
-  preloadedState: {
-    auth: {
-      user: {
-        id: '1',
-        username: 'testuser',
-        email: 'test@example.com',
-      },
-      isAuthenticated: true,
-      isLoading: false,
-      error: null,
-    },
-    notes: {
-      items: [],
-      isLoading: false,
-      error: null,
-    },
-  },
-});
+// Create a userEvent instance
+const user = userEvent.setup();
 
 const renderWithProviders = (
   component: React.ReactElement,
@@ -74,13 +53,12 @@ describe('Profile Component', () => {
     
     expect(screen.getByLabelText(/username/i)).toHaveValue('testuser');
     expect(screen.getByLabelText(/email/i)).toHaveValue('test@example.com');
-  });
-  it('shows validation errors for invalid input', async () => {
+  });  it('shows validation errors for invalid input', async () => {
     renderWithProviders(<Profile />);
     
     const emailInput = screen.getByLabelText(/email/i);
-    await userEvent.type(emailInput, 'invalid-email');
-    await userEvent.tab();
+    await user.type(emailInput, 'invalid-email');
+    await user.tab();
 
     await waitFor(() => {
       const errorText = screen.getByText('Enter a valid email');

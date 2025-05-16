@@ -17,6 +17,21 @@
 2. Verify Docker containers are running
 3. Check service health status
 
+## Frontend Features & Usage (2024 Update)
+
+- **Authentication:** Register and log in to access the app. Protected routes ensure only authenticated users can access notes, content processing, and profile pages.
+- **Notes Management:**
+  - View, search, filter, and sort your notes on the Notes page.
+  - Create new notes or edit existing ones with a rich text editor and tags.
+- **Content Processing:**
+  - Use the Content Processor page to extract content from web pages or PDFs by entering a URL. The extracted content is sent to the note editor for further editing and saving.
+- **User Profile:**
+  - View and update your username and email.
+  - Change your password with validation.
+  - See stats like total notes and average notes per day.
+- **Navigation:**
+  - Use the main navigation bar to access Home, Notes, Content Processor, and Profile.
+
 ## Daily Refresher Checklist
 
 ### Morning Routine

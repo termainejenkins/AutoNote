@@ -65,6 +65,18 @@ DevOps:
 - Repository Pattern
 - Factory Pattern for Content Scrapers
 
+### 3.1.1 Frontend Architecture and Features (2024 Update)
+- **Pages:** Home, Login, Register, NotesList, NoteEditor, ContentProcessor, Profile
+- **Components:** MainLayout, Navbar, Dashboard, NoteDetail, NotesList, PrivateRoute
+- **Authentication:** Login, registration, protected routes, user profile management
+- **Notes Management:** List, create, edit, search, filter, sort, tag notes
+- **Content Processing:** Web and PDF content extraction via URL, with UI for processing and note creation
+- **State Management:** Redux Toolkit slices for auth and notes
+- **API Integration:** Centralized service for backend communication (auth, notes, content)
+- **UI/UX:** Material-UI for design, TinyMCE for rich text editing, responsive layouts
+- **Routing:** React Router v6, with public and protected routes
+- **TypeScript:** Used for type safety across state, API, and components
+
 ## 4. System Architecture
 
 ### 4.1 High-Level Architecture

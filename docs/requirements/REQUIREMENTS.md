@@ -49,6 +49,9 @@ AutoNote is an intelligent note-taking application that automatically captures a
 - Extracts key points
 - Supports multiple video platforms
 
+> **Implementation Note (2024):**
+> - Web and PDF content capture via URL are implemented in the frontend UI. Video capture is planned.
+
 ### 2.2 Note Management
 
 #### US-004: Note Organization
@@ -73,6 +76,9 @@ AutoNote is an intelligent note-taking application that automatically captures a
 - Insert images
 - Format text
 
+> **Implementation Note (2024):**
+> - Note CRUD, organization, search, tagging, and editing are implemented in the frontend.
+
 ### 2.3 AI Features
 
 #### US-006: Content Summarization
@@ -96,6 +102,9 @@ AutoNote is an intelligent note-taking application that automatically captures a
 - Topic detection
 - Related content suggestions
 - Smart folders
+
+> **Implementation Note (2024):**
+> - UI for AI features is present; backend integration is pending.
 
 ## 3. Technical Requirements
 
@@ -132,6 +141,9 @@ AutoNote is an intelligent note-taking application that automatically captures a
 - Role-based access
 - Resource-level permissions
 - Audit logging
+
+> **Implementation Note (2024):**
+> - Authentication (login/register, protected routes, user profile) is implemented in the frontend.
 
 ### 3.3 Integration Requirements
 

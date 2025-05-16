@@ -26,27 +26,41 @@ import {
 import { RootState } from '../../store';
 import { updateUser } from '../../store/slices/authSlice';
 
-const validationSchema = Yup.object({
+const validationSchema = Yup.object().shape({
   username: Yup.string()
     .min(3, 'Username should be of minimum 3 characters length')
+    .max(30, 'Username should be of maximum 30 characters length')
+    .matches(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores and hyphens')
     .required('Username is required'),
   email: Yup.string()
     .email('Enter a valid email')
-    .required('Email is required'),
+    .required('Email is required')
+    .max(255, 'Email is too long'),
   currentPassword: Yup.string()
-    .min(8, 'Password should be of minimum 8 characters length')
     .when('newPassword', {
-      is: (val: string) => val?.length > 0,
-      then: Yup.string().required('Current password is required'),
+      is: (val: string) => val && val.length > 0,
+      then: (schema) => schema.required('Current password is required')
+        .min(8, 'Password should be of minimum 8 characters length'),
+      otherwise: (schema) => schema
     }),
   newPassword: Yup.string()
-    .min(8, 'Password should be of minimum 8 characters length'),
+    .test('different', 'New password must be different from current password',
+      function(value) {
+        return !value || value !== this.parent.currentPassword;
+      })
+    .test('complexity', 'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',
+      function(value) {
+        if (!value) return true;
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return regex.test(value);
+      }),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref('newPassword')], 'Passwords must match')
     .when('newPassword', {
-      is: (val: string) => val?.length > 0,
-      then: Yup.string().required('Confirm password is required'),
-    }),
+      is: (val: string) => val && val.length > 0,
+      then: (schema) => schema.required('Confirm password is required')
+        .oneOf([Yup.ref('newPassword')], 'Passwords must match'),
+      otherwise: (schema) => schema
+    })
 });
 
 const Profile: React.FC = () => {

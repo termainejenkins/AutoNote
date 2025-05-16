@@ -23,8 +23,18 @@ import {
   Note as NoteIcon,
   AccessTime as TimeIcon,
 } from '@mui/icons-material';
-import { RootState } from '../../store';
+import { RootState, AppDispatch } from '../../store';
 import { updateUser } from '../../store/slices/authSlice';
+import { authApi } from '../../services/api';
+import { User } from '../../types';
+
+interface ProfileFormValues {
+  username: string;
+  email: string;
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
 
 const validationSchema = Yup.object().shape({
   username: Yup.string()
@@ -64,12 +74,13 @@ const validationSchema = Yup.object().shape({
 });
 
 const Profile: React.FC = () => {
-  const dispatch = useDispatch();
-  const { user, loading, error } = useSelector((state: RootState) => state.auth);
-  const { notes } = useSelector((state: RootState) => state.notes);
+  const dispatch = useDispatch<AppDispatch>();
+  const { user, isLoading, error: authError } = useSelector((state: RootState) => state.auth);
+  const { items: notes } = useSelector((state: RootState) => state.notes);
   const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const formik = useFormik({
+  const formik = useFormik<ProfileFormValues>({
     initialValues: {
       username: user?.username || '',
       email: user?.email || '',
@@ -77,9 +88,13 @@ const Profile: React.FC = () => {
       newPassword: '',
       confirmPassword: '',
     },
-    validationSchema,    onSubmit: async (values) => {
+    validationSchema,
+    onSubmit: async (values) => {
       try {
-        const updates: { username?: string; email?: string } = {};
+        setError(null);
+        setSuccess(null);
+        
+        const updates: Partial<User> = {};
         
         if (values.username !== user?.username) {
           updates.username = values.username;
@@ -88,7 +103,7 @@ const Profile: React.FC = () => {
           updates.email = values.email;
         }
 
-        // Only dispatch update if there are changes
+        // Only dispatch update if there are profile changes
         if (Object.keys(updates).length > 0) {
           await dispatch(updateUser({
             id: user?.id || '',
@@ -98,7 +113,7 @@ const Profile: React.FC = () => {
 
         // Handle password update if new password is provided
         if (values.newPassword) {
-          await api.updatePassword(values.currentPassword, values.newPassword);
+          await authApi.updatePassword(values.currentPassword, values.newPassword);
         }
 
         setSuccess('Profile updated successfully');
@@ -111,16 +126,30 @@ const Profile: React.FC = () => {
           },
         });
       } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to update profile');
         console.error('Failed to update profile:', err);
       }
     },
   });
-
-  const stats = {
-    totalNotes: notes.length,
-    lastActive: new Date().toLocaleDateString(),
-    averageNotesPerDay: Math.round(notes.length / 30), // Assuming 30 days
+  const calculateStats = () => {
+    const totalNotes = notes.length;
+    const now = new Date();
+    const oldestNoteDate = notes.length > 0 
+      ? new Date(Math.min(...notes.map(note => new Date(note.createdAt).getTime())))
+      : now;
+    
+    const daysSinceFirstNote = Math.max(1, Math.ceil((now.getTime() - oldestNoteDate.getTime()) / (1000 * 60 * 60 * 24)));
+    
+    return {
+      totalNotes,
+      lastActive: user?.lastActive 
+        ? new Date(user.lastActive).toLocaleDateString() 
+        : now.toLocaleDateString(),
+      averageNotesPerDay: (totalNotes / daysSinceFirstNote).toFixed(1)
+    };
   };
+
+  const stats = calculateStats();
 
   return (
     <Box sx={{ flexGrow: 1, p: 3 }}>
@@ -135,6 +164,12 @@ const Profile: React.FC = () => {
               <Typography variant="h6" gutterBottom>
                 Account Information
               </Typography>
+
+              {authError && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {authError}
+                </Alert>
+              )}
 
               {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
@@ -219,9 +254,9 @@ const Profile: React.FC = () => {
                 <Button
                   type="submit"
                   variant="contained"
-                  disabled={loading}
+                  disabled={isLoading}
                 >
-                  {loading ? 'Saving...' : 'Save Changes'}
+                  {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </Box>
             </CardContent>
@@ -273,4 +308,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile; 
+export default Profile;

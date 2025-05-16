@@ -1,11 +1,25 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, AnyAction } from '@reduxjs/toolkit';
+import { ThunkDispatch } from 'redux-thunk';
 import authReducer, { login, register, logout, updateUser } from '../authSlice';
 import { authApi } from '../../../services/api';
+import { AuthState } from '../../../types/auth';
 
-jest.mock('../../../services/api');
+// Mock the API
+jest.mock('../../../services/api', () => ({
+  authApi: {
+    login: jest.fn(),
+    register: jest.fn(),
+    logout: jest.fn(),
+    updateUser: jest.fn(),
+    updatePassword: jest.fn(),
+  }
+}));
+
+type AppDispatch = ThunkDispatch<{ auth: AuthState }, unknown, AnyAction>;
 
 describe('Auth Slice', () => {
   let store: ReturnType<typeof configureStore>;
+  let dispatch: AppDispatch;
 
   beforeEach(() => {
     store = configureStore({
@@ -13,6 +27,7 @@ describe('Auth Slice', () => {
         auth: authReducer,
       },
     });
+    dispatch = store.dispatch as AppDispatch;
   });
 
   afterEach(() => {

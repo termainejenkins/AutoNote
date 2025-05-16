@@ -43,6 +43,9 @@ const notesSlice = createSlice({
     clearCurrentNote: (state) => {
       state.currentNote = null;
     },
+    setCurrentNote: (state, action) => {
+      state.currentNote = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder

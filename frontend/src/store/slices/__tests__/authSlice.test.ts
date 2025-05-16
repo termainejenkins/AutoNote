@@ -71,13 +71,30 @@ describe('Auth Slice', () => {
       expect(state.auth.user).toBeNull();
       expect(state.auth.error).toContain(errorMessage);
     });
-  });
-  describe('updateUser action', () => {
+  });  describe('updateUser action', () => {
     const mockUser = {
       id: '1',
       username: 'updateduser',
       email: 'updated@example.com',
     };
+
+    beforeEach(() => {
+      store = configureStore({
+        reducer: {
+          auth: authReducer,
+        },
+        preloadedState: {
+          auth: {
+            user: { id: '1', username: 'testuser', email: 'test@example.com' },
+            isAuthenticated: true,
+            token: 'test-token',
+            isLoading: false,
+            error: null,
+          },
+        },
+      });
+      dispatch = store.dispatch as AppDispatch;
+    });
 
     it('handles successful user update', async () => {
       (authApi.updateUser as jest.Mock).mockResolvedValue(mockUser);

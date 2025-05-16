@@ -1,22 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { Note, NotesState } from '../../types/notes';
 import { notesApi } from '../../services/api';
-
-interface Note {
-  id: number;
-  title: string;
-  content: string;
-  source_url?: string;
-  source_type: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface NotesState {
-  items: Note[];
-  currentNote: Note | null;
-  isLoading: boolean;
-  error: string | null;
-}
 
 const initialState: NotesState = {
   items: [],
@@ -25,23 +9,16 @@ const initialState: NotesState = {
   error: null,
 };
 
+// Async actions
 export const fetchNotes = createAsyncThunk('notes/fetchNotes', async () => {
   const response = await notesApi.getNotes();
   return response;
 });
 
-export const fetchNote = createAsyncThunk('notes/fetchNote', async (id: number) => {
-  const response = await notesApi.getNote(id);
+export const createNote = createAsyncThunk('notes/createNote', async (data: Partial<Note>) => {
+  const response = await notesApi.createNote(data);
   return response;
 });
-
-export const createNote = createAsyncThunk(
-  'notes/createNote',
-  async (data: Partial<Note>) => {
-    const response = await notesApi.createNote(data);
-    return response;
-  }
-);
 
 export const updateNote = createAsyncThunk(
   'notes/updateNote',
@@ -81,18 +58,6 @@ const notesSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message || 'Failed to fetch notes';
       })
-      .addCase(fetchNote.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(fetchNote.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.currentNote = action.payload;
-      })
-      .addCase(fetchNote.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.error.message || 'Failed to fetch note';
-      })
       .addCase(createNote.fulfilled, (state, action) => {
         state.items.push(action.payload);
       })
@@ -101,15 +66,9 @@ const notesSlice = createSlice({
         if (index !== -1) {
           state.items[index] = action.payload;
         }
-        if (state.currentNote?.id === action.payload.id) {
-          state.currentNote = action.payload;
-        }
       })
       .addCase(deleteNote.fulfilled, (state, action) => {
         state.items = state.items.filter((note) => note.id !== action.payload);
-        if (state.currentNote?.id === action.payload) {
-          state.currentNote = null;
-        }
       });
   },
 });

@@ -23,7 +23,7 @@ import {
 } from '@mui/icons-material';
 import { AppDispatch, RootState } from '../../store';
 import { fetchNotes } from '../../store/slices/notesSlice';
-import type { Note } from '../../types/notes';
+import { Note } from '../../types/notes';
 
 type SortOption = 'newest' | 'oldest' | 'title';
 
@@ -68,36 +68,45 @@ const NotesList: React.FC = () => {
 
   const handleTagToggle = (tag: string) => {
     setSelectedTags((prev) =>
-      prev.includes(tag)
-        ? prev.filter((t) => t !== tag)
-        : [...prev, tag]
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
-  const filteredNotes = notes.filter((note: Note) => {
-    const searchMatches = note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      note.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const tagMatches = selectedTags.length === 0 ||
-      selectedTags.every((tag) => note.tags?.includes(tag));
-    return searchMatches && tagMatches;
-  }).sort((a: Note, b: Note) => {
-    switch (sortBy) {
-      case 'newest':
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      case 'oldest':
-        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-      case 'title':
-        return a.title.localeCompare(b.title);
-      default:
-        return 0;
-    }
-  });
+  const filteredNotes = notes
+    .filter((note: Note) => {
+      const matchesSearch =
+        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        note.content.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesTags =
+        selectedTags.length === 0 ||
+        selectedTags.every((tag) => note.tags?.includes(tag));
+      return matchesSearch && matchesTags;
+    })
+    .sort((a: Note, b: Note) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'title':
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
+      }
+    });
 
-  const allTags = Array.from(new Set(notes.flatMap((note: Note) => note.tags || [])));
+  const allTags = Array.from(new Set(notes.flatMap((note) => note.tags || [])));
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '60vh',
+        }}
+      >
         <CircularProgress />
       </Box>
     );

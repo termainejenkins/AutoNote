@@ -12,7 +12,7 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
-import { processContent } from '../../services/api';
+import { notesApi } from '../../services/api';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -55,7 +55,7 @@ const ContentProcessor: React.FC = () => {
 
     try {
       const type = tabValue === 0 ? 'web' : 'pdf';
-      const response = await processContent(url, type);
+      const response = await notesApi.processContent(url, type);
       navigate(`/notes/new?content=${encodeURIComponent(JSON.stringify(response))}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to process content');

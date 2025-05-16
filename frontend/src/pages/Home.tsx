@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material';
 import { RootState } from '../store';
 import { fetchNotes } from '../store/slices/notesSlice';
+import { notesApi } from '../services/api';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();

@@ -15,12 +15,8 @@ import {
 } from '@mui/material';
 import { Editor } from '@tinymce/tinymce-react';
 import { RootState } from '../../store';
-import { getNote, createNote, updateNote } from '../../services/api';
-import {
-  fetchNotesStart,
-  fetchNotesSuccess,
-  fetchNotesFailure,
-} from '../../store/slices/notesSlice';
+import { notesApi } from '../../services/api';
+import { fetchNotes } from '../../store/slices/notesSlice';
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
@@ -47,9 +43,9 @@ const NoteEditor: React.FC = () => {
       try {
         setIsSubmitting(true);
         if (id) {
-          await updateNote(id, values);
+          await notesApi.updateNote(id, values);
         } else {
-          await createNote(values);
+          await notesApi.createNote(values);
         }
         navigate('/notes');
       } catch (err) {
@@ -64,20 +60,18 @@ const NoteEditor: React.FC = () => {
     const fetchNote = async () => {
       if (id) {
         try {
-          dispatch(fetchNotesStart());
-          const response = await getNote(id);
+          const response = await notesApi.getNote(id);
           formik.setValues({
             title: response.title,
             content: response.content,
             tags: response.tags,
           });
-          dispatch(fetchNotesSuccess([response]));
+          dispatch(fetchNotes());
         } catch (err) {
-          dispatch(fetchNotesFailure(err instanceof Error ? err.message : 'Failed to fetch note'));
+          console.error('Failed to fetch note:', err);
         }
       }
     };
-
     fetchNote();
   }, [id, dispatch]);
 

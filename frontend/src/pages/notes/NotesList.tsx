@@ -24,6 +24,7 @@ import {
 import { AppDispatch, RootState } from '../../store';
 import { fetchNotes } from '../../store/slices/notesSlice';
 import { Note } from '../../types/notes';
+import { notesApi } from '../../services/api';
 
 type SortOption = 'newest' | 'oldest' | 'title';
 

@@ -77,5 +77,9 @@ export const notesApi = {
   processContent: async (content: string) => {
     const response = await api.post('/notes/process', { content });
     return response.data;
-  }
+  },
+  async processContent(url: string, type: 'web' | 'pdf') {
+    const response = await api.post('/content/process', { url, type });
+    return response.data;
+  },
 };

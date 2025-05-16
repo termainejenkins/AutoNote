@@ -27,17 +27,7 @@ const Home: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        dispatch(fetchNotesStart());
-        const response = await getNotes();
-        dispatch(fetchNotesSuccess(response));
-      } catch (err) {
-        dispatch(fetchNotesFailure(err instanceof Error ? err.message : 'Failed to fetch notes'));
-      }
-    };
-
-    fetchNotes();
+    dispatch(fetchNotes());
   }, [dispatch]);
 
   const handleCreateNote = () => {

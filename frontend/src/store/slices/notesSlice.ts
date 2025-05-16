@@ -58,17 +58,49 @@ const notesSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message || 'Failed to fetch notes';
       })
+      .addCase(createNote.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(createNote.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.items.push(action.payload);
+        state.currentNote = action.payload;
+      })
+      .addCase(createNote.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to create note';
+      })
+      .addCase(updateNote.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
       })
       .addCase(updateNote.fulfilled, (state, action) => {
+        state.isLoading = false;
         const index = state.items.findIndex((note) => note.id === action.payload.id);
         if (index !== -1) {
           state.items[index] = action.payload;
         }
+        state.currentNote = action.payload;
+      })
+      .addCase(updateNote.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to update note';
+      })
+      .addCase(deleteNote.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
       })
       .addCase(deleteNote.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.items = state.items.filter((note) => note.id !== action.payload);
+        if (state.currentNote?.id === action.payload) {
+          state.currentNote = null;
+        }
+      })
+      .addCase(deleteNote.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to delete note';
       });
   },
 });

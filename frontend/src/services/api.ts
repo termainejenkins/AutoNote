@@ -40,6 +40,13 @@ export const authApi = {
   logout: () => {
     localStorage.removeItem('token');
   },
+  updatePassword: async (currentPassword: string, newPassword: string) => {
+    const response = await api.put('/auth/change-password', {
+      currentPassword,
+      newPassword,
+    });
+    return response.data;
+  },
 };
 
 export const notesApi = {

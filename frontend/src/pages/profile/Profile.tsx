@@ -63,15 +63,30 @@ const Profile: React.FC = () => {
       newPassword: '',
       confirmPassword: '',
     },
-    validationSchema,
-    onSubmit: async (values) => {
+    validationSchema,    onSubmit: async (values) => {
       try {
-        // TODO: Implement profile update API call
-        dispatch(updateUser({
-          id: user?.id || '',
-          username: values.username,
-          email: values.email,
-        }));
+        const updates: { username?: string; email?: string } = {};
+        
+        if (values.username !== user?.username) {
+          updates.username = values.username;
+        }
+        if (values.email !== user?.email) {
+          updates.email = values.email;
+        }
+
+        // Only dispatch update if there are changes
+        if (Object.keys(updates).length > 0) {
+          await dispatch(updateUser({
+            id: user?.id || '',
+            ...updates
+          })).unwrap();
+        }
+
+        // Handle password update if new password is provided
+        if (values.newPassword) {
+          await api.updatePassword(values.currentPassword, values.newPassword);
+        }
+
         setSuccess('Profile updated successfully');
         formik.resetForm({
           values: {

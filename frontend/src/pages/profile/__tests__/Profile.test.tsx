@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from '@mui/material/styles';
 import { configureStore } from '@reduxjs/toolkit';
@@ -32,9 +33,34 @@ const mockStore = configureStore({
   },
 });
 
-const renderWithProviders = (component: React.ReactElement) => {
+const renderWithProviders = (
+  component: React.ReactElement,
+  initialState = {
+    auth: {
+      user: { id: 1, username: 'testuser', email: 'test@example.com', created_at: new Date().toISOString() },
+      isAuthenticated: true,
+      token: 'test-token',
+      isLoading: false,
+      error: null,
+    },
+    notes: {
+      items: [],
+      currentNote: null,
+      isLoading: false,
+      error: null,
+    },
+  }
+) => {
+  const store = configureStore({
+    reducer: {
+      auth: authReducer,
+      notes: notesReducer,
+    },
+    preloadedState: initialState,
+  });
+
   return render(
-    <Provider store={mockStore}>
+    <Provider store={store}>
       <ThemeProvider theme={theme}>
         {component}
       </ThemeProvider>
@@ -49,16 +75,16 @@ describe('Profile Component', () => {
     expect(screen.getByLabelText(/username/i)).toHaveValue('testuser');
     expect(screen.getByLabelText(/email/i)).toHaveValue('test@example.com');
   });
-
   it('shows validation errors for invalid input', async () => {
     renderWithProviders(<Profile />);
     
     const emailInput = screen.getByLabelText(/email/i);
-    fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
-    fireEvent.blur(emailInput);
+    await userEvent.type(emailInput, 'invalid-email');
+    await userEvent.tab();
 
     await waitFor(() => {
-      expect(screen.getByText(/enter a valid email/i)).toBeInTheDocument();
+      const errorText = screen.getByText('Enter a valid email');
+      expect(errorText).toBeInTheDocument();
     });
   });
 

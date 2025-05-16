@@ -71,9 +71,8 @@ describe('Auth Slice', () => {
       expect(state.auth.user).toBeNull();
       expect(state.auth.error).toContain(errorMessage);
     });
-  });  describe('updateUser action', () => {
-    const mockUser = {
-      id: '1',
+  });  describe('updateUser action', () => {    const mockUser = {
+      id: 1,
       username: 'updateduser',
       email: 'updated@example.com',
     };
@@ -82,10 +81,9 @@ describe('Auth Slice', () => {
       store = configureStore({
         reducer: {
           auth: authReducer,
-        },
-        preloadedState: {
+        },        preloadedState: {
           auth: {
-            user: { id: '1', username: 'testuser', email: 'test@example.com' },
+            user: { id: 1, username: 'testuser', email: 'test@example.com', created_at: new Date().toISOString() },
             isAuthenticated: true,
             token: 'test-token',
             isLoading: false,

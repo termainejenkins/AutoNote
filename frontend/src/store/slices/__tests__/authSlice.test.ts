@@ -52,24 +52,24 @@ describe('Auth Slice', () => {
     it('handles successful login', async () => {
       (authApi.login as jest.Mock).mockResolvedValue(mockResponse);
 
-      await store.dispatch(login(mockCredentials));
-      const state = store.getState().auth;
+      await dispatch(login(mockCredentials));
+      const state = store.getState() as { auth: AuthState };
 
-      expect(state.isAuthenticated).toBe(true);
-      expect(state.user).toEqual(mockResponse.user);
-      expect(state.error).toBeNull();
+      expect(state.auth.isAuthenticated).toBe(true);
+      expect(state.auth.user).toEqual(mockResponse.user);
+      expect(state.auth.error).toBeNull();
     });
 
     it('handles login failure', async () => {
       const errorMessage = 'Invalid credentials';
       (authApi.login as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
-      await store.dispatch(login(mockCredentials));
-      const state = store.getState().auth;
+      await dispatch(login(mockCredentials));
+      const state = store.getState() as { auth: AuthState };
 
-      expect(state.isAuthenticated).toBe(false);
-      expect(state.user).toBeNull();
-      expect(state.error).toContain(errorMessage);
+      expect(state.auth.isAuthenticated).toBe(false);
+      expect(state.auth.user).toBeNull();
+      expect(state.auth.error).toContain(errorMessage);
     });
   });
 

@@ -130,21 +130,18 @@ const Profile: React.FC = () => {
         console.error('Failed to update profile:', err);
       }
     },
-  });
-  const calculateStats = () => {
+  });  const calculateStats = () => {
     const totalNotes = notes.length;
     const now = new Date();
     const oldestNoteDate = notes.length > 0 
-      ? new Date(Math.min(...notes.map(note => new Date(note.createdAt).getTime())))
+      ? new Date(Math.min(...notes.map(note => new Date(note.created_at).getTime())))
       : now;
     
     const daysSinceFirstNote = Math.max(1, Math.ceil((now.getTime() - oldestNoteDate.getTime()) / (1000 * 60 * 60 * 24)));
     
     return {
       totalNotes,
-      lastActive: user?.lastActive 
-        ? new Date(user.lastActive).toLocaleDateString() 
-        : now.toLocaleDateString(),
+      lastActive: now.toLocaleDateString(), // Using current date since we don't track last active
       averageNotesPerDay: (totalNotes / daysSinceFirstNote).toFixed(1)
     };
   };

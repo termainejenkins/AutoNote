@@ -32,6 +32,14 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   authApi.logout();
 });
 
+export const updateUser = createAsyncThunk(
+  'auth/updateUser',
+  async (userData: { id: string; username?: string; email?: string }) => {
+    const response = await authApi.updateUser(userData);
+    return response;
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -74,6 +82,21 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
+      })
+      .addCase(updateUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        if (state.user) {
+          state.user = { ...state.user, ...action.payload };
+        }
+        state.error = null;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to update user';
       });
   },
 });

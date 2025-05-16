@@ -47,6 +47,10 @@ export const authApi = {
     });
     return response.data;
   },
+  updateUser: async (data: { id: string; username?: string; email?: string }) => {
+    const response = await api.put(`/auth/users/${data.id}`, data);
+    return response.data;
+  },
 };
 
 export const notesApi = {

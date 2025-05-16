@@ -58,7 +58,7 @@ export const notesApi = {
     const response = await api.get('/notes');
     return response.data;
   },
-  getNote: async (id: number) => {
+  getNote: async (id: string) => {
     const response = await api.get(`/notes/${id}`);
     return response.data;
   },
@@ -66,11 +66,11 @@ export const notesApi = {
     const response = await api.post('/notes', data);
     return response.data;
   },
-  updateNote: async (id: number, data: { title?: string; content?: string; tags?: string[] }) => {
+  updateNote: async (id: string, data: { title?: string; content?: string; tags?: string[] }) => {
     const response = await api.put(`/notes/${id}`, data);
     return response.data;
   },
-  deleteNote: async (id: number) => {
+  deleteNote: async (id: string) => {
     const response = await api.delete(`/notes/${id}`);
     return response.data;
   },

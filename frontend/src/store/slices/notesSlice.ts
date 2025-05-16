@@ -15,20 +15,20 @@ export const fetchNotes = createAsyncThunk('notes/fetchNotes', async () => {
   return response;
 });
 
-export const createNote = createAsyncThunk('notes/createNote', async (data: Partial<Note>) => {
+export const createNote = createAsyncThunk('notes/createNote', async (data: { title: string; content: string; tags?: string[] }) => {
   const response = await notesApi.createNote(data);
   return response;
 });
 
 export const updateNote = createAsyncThunk(
   'notes/updateNote',
-  async ({ id, data }: { id: number; data: Partial<Note> }) => {
+  async ({ id, data }: { id: string; data: Partial<Note> }) => {
     const response = await notesApi.updateNote(id, data);
     return response;
   }
 );
 
-export const deleteNote = createAsyncThunk('notes/deleteNote', async (id: number) => {
+export const deleteNote = createAsyncThunk('notes/deleteNote', async (id: string) => {
   await notesApi.deleteNote(id);
   return id;
 });

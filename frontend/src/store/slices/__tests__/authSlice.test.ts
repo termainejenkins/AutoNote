@@ -36,11 +36,9 @@ describe('Auth Slice', () => {
     const mockCredentials = {
       email: 'test@example.com',
       password: 'password123',
-    };
-
-    const mockResponse = {
+    };    const mockResponse = {
       user: {
-        id: 1,
+        id: '1',
         email: 'test@example.com',
         username: 'testuser',
         created_at: new Date().toISOString(),
@@ -71,10 +69,9 @@ describe('Auth Slice', () => {
       expect(state.auth.error).toContain(errorMessage);
     });
   });
-
   describe('updateUser action', () => {
-    const mockUser: Partial<User> & { id: number } = {
-      id: 1,
+    const mockUser = {
+      id: '1',
       username: 'updateduser',
       email: 'updated@example.com',
       created_at: new Date().toISOString(),
@@ -86,9 +83,8 @@ describe('Auth Slice', () => {
           auth: authReducer,
         },
         preloadedState: {
-          auth: {
-            user: {
-              id: 1,
+          auth: {            user: {
+              id: '1',
               username: 'testuser',
               email: 'test@example.com',
               created_at: new Date().toISOString(),

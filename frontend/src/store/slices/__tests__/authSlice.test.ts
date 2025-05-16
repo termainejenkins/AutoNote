@@ -72,7 +72,6 @@ describe('Auth Slice', () => {
       expect(state.auth.error).toContain(errorMessage);
     });
   });
-
   describe('updateUser action', () => {
     const mockUser = {
       id: '1',
@@ -83,21 +82,21 @@ describe('Auth Slice', () => {
     it('handles successful user update', async () => {
       (authApi.updateUser as jest.Mock).mockResolvedValue(mockUser);
 
-      await store.dispatch(updateUser(mockUser));
-      const state = store.getState().auth;
+      await dispatch(updateUser(mockUser));
+      const state = store.getState() as { auth: AuthState };
 
-      expect(state.user).toEqual(mockUser);
-      expect(state.error).toBeNull();
+      expect(state.auth.user).toEqual(mockUser);
+      expect(state.auth.error).toBeNull();
     });
 
     it('handles update failure', async () => {
       const errorMessage = 'Update failed';
       (authApi.updateUser as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
-      await store.dispatch(updateUser(mockUser));
-      const state = store.getState().auth;
+      await dispatch(updateUser(mockUser));
+      const state = store.getState() as { auth: AuthState };
 
-      expect(state.error).toContain(errorMessage);
+      expect(state.auth.error).toContain(errorMessage);
     });
   });
 });

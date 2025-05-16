@@ -108,5 +108,5 @@ const notesSlice = createSlice({
   },
 });
 
-export const { clearError, clearCurrentNote } = notesSlice.actions;
+export const { clearError, clearCurrentNote, setCurrentNote } = notesSlice.actions;
 export default notesSlice.reducer;

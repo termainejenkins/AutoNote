@@ -7,7 +7,6 @@ import {
   Card,
   CardContent,
   Grid,
-  IconButton,
   InputAdornment,
   TextField,
   Typography,
@@ -22,20 +21,16 @@ import {
   FilterList as FilterIcon,
   Sort as SortIcon,
 } from '@mui/icons-material';
-import { RootState } from '../../store';
-import { getNotes } from '../../services/api';
-import {
-  fetchNotesStart,
-  fetchNotesSuccess,
-  fetchNotesFailure,
-} from '../../store/slices/notesSlice';
+import { AppDispatch, RootState } from '../../store';
+import { fetchNotes } from '../../store/slices/notesSlice';
+import type { Note } from '../../types/notes';
 
 type SortOption = 'newest' | 'oldest' | 'title';
 
 const NotesList: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { notes, loading } = useSelector((state: RootState) => state.notes);
+  const dispatch = useDispatch<AppDispatch>();
+  const { items: notes, isLoading } = useSelector((state: RootState) => state.notes);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
@@ -43,17 +38,7 @@ const NotesList: React.FC = () => {
   const [sortAnchorEl, setSortAnchorEl] = useState<null | HTMLElement>(null);
 
   useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        dispatch(fetchNotesStart());
-        const response = await getNotes();
-        dispatch(fetchNotesSuccess(response));
-      } catch (err) {
-        dispatch(fetchNotesFailure(err instanceof Error ? err.message : 'Failed to fetch notes'));
-      }
-    };
-
-    fetchNotes();
+    dispatch(fetchNotes());
   }, [dispatch]);
 
   const handleCreateNote = () => {
@@ -89,39 +74,30 @@ const NotesList: React.FC = () => {
     );
   };
 
-  const filteredNotes = notes
-    .filter((note) => {
-      const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesTags = selectedTags.length === 0 ||
-        selectedTags.every((tag) => note.tags.includes(tag));
-      return matchesSearch && matchesTags;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case 'oldest':
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        case 'title':
-          return a.title.localeCompare(b.title);
-        default:
-          return 0;
-      }
-    });
+  const filteredNotes = notes.filter((note: Note) => {
+    const searchMatches = note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      note.content.toLowerCase().includes(searchQuery.toLowerCase());
+    const tagMatches = selectedTags.length === 0 ||
+      selectedTags.every((tag) => note.tags?.includes(tag));
+    return searchMatches && tagMatches;
+  }).sort((a: Note, b: Note) => {
+    switch (sortBy) {
+      case 'newest':
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      case 'oldest':
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      case 'title':
+        return a.title.localeCompare(b.title);
+      default:
+        return 0;
+    }
+  });
 
-  const allTags = Array.from(new Set(notes.flatMap((note) => note.tags)));
+  const allTags = Array.from(new Set(notes.flatMap((note: Note) => note.tags || [])));
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '60vh',
-        }}
-      >
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
         <CircularProgress />
       </Box>
     );
@@ -226,19 +202,21 @@ const NotesList: React.FC = () => {
                 >
                   {note.content}
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {note.tags.map((tag) => (
-                    <Chip
-                      key={tag}
-                      label={tag}
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTagToggle(tag);
-                      }}
-                    />
-                  ))}
-                </Box>
+                {note.tags && note.tags.length > 0 && (
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    {note.tags.map((tag: string) => (
+                      <Chip
+                        key={tag}
+                        label={tag}
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTagToggle(tag);
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
               </CardContent>
             </Card>
           </Grid>
@@ -274,4 +252,4 @@ const NotesList: React.FC = () => {
   );
 };
 
-export default NotesList; 
+export default NotesList;

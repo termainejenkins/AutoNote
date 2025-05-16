@@ -17,17 +17,12 @@ import {
   PictureAsPdf as PdfIcon,
 } from '@mui/icons-material';
 import { RootState } from '../store';
-import { getNotes } from '../services/api';
-import {
-  fetchNotesStart,
-  fetchNotesSuccess,
-  fetchNotesFailure,
-} from '../store/slices/notesSlice';
+import { fetchNotes } from '../store/slices/notesSlice';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { notes, loading } = useSelector((state: RootState) => state.notes);
+  const { items: notes, isLoading } = useSelector((state: RootState) => state.notes);
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -52,7 +47,7 @@ const Home: React.FC = () => {
     navigate(`/content/process?type=${type}`);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Box
         sx={{

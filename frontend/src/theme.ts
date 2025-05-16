@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
-export const theme = createTheme({
+const theme = createTheme({
   palette: {
     primary: {
       main: '#2196f3',
@@ -48,8 +48,9 @@ export const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'none',
           borderRadius: 8,
+          textTransform: 'none',
+          fontWeight: 500,
         },
       },
     },
@@ -57,9 +58,11 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 12,
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         },
       },
     },
   },
-}); 
+});
+
+export default theme;

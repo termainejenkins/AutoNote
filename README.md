@@ -1,5 +1,12 @@
 # AutoNote
 
+Copyright © 2025 SENTIENT SOLUTIONS LLC. All rights reserved.
+Created by Termaine "TJ" Jenkins
+
+This software and associated documentation files are the exclusive property of SENTIENT SOLUTIONS LLC. 
+No part of this software may be reproduced, distributed, or transmitted in any form or by any means 
+without the prior written permission of SENTIENT SOLUTIONS LLC.
+
 AutoNote is a comprehensive note-taking and content processing platform that helps users capture, organize, and enhance their notes using AI-powered features.
 
 ## Features
@@ -105,10 +112,11 @@ Access the monitoring dashboards:
 4. Push to the branch
 5. Create a Pull Request
 
-## License
+## Proprietary Software Notice
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This software is proprietary and confidential. 
+Unauthorized copying, transfer, or reproduction of the contents of this software, via any medium, is strictly prohibited.
 
 ## Support
 
-For support, please open an issue in the GitHub repository or contact the development team. 
+For support, please open an issue in the GitHub repository or contact the development team.

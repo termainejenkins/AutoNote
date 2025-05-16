@@ -12,9 +12,8 @@ import {
   Typography,
   Alert,
 } from '@mui/material';
-import { RootState } from '../../store';
-import { loginStart, loginSuccess, loginFailure } from '../../store/slices/authSlice';
-import { login } from '../../services/api';
+import { AppDispatch, RootState } from '../../store';
+import { login } from '../../store/slices/authSlice';
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -27,8 +26,8 @@ const validationSchema = Yup.object({
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+  const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
   const formik = useFormik({
     initialValues: {
@@ -38,12 +37,11 @@ const Login: React.FC = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        dispatch(loginStart());
-        const response = await login(values.email, values.password);
-        dispatch(loginSuccess({ token: response.token }));
+        await dispatch(login({ email: values.email, password: values.password })).unwrap();
         navigate('/');
       } catch (err) {
-        dispatch(loginFailure(err instanceof Error ? err.message : 'Login failed'));
+        // Error handling is managed by Redux
+        console.error('Login failed:', err);
       }
     },
   });
@@ -61,16 +59,12 @@ const Login: React.FC = () => {
         <Typography component="h1" variant="h5">
           Sign in to AutoNote
         </Typography>
-        {error && (
-          <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
-            {error}
-          </Alert>
-        )}
-        <Box
-          component="form"
-          onSubmit={formik.handleSubmit}
-          sx={{ mt: 1, width: '100%' }}
-        >
+        <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 1 }}>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
           <TextField
             margin="normal"
             required
@@ -104,9 +98,9 @@ const Login: React.FC = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
           <Box sx={{ textAlign: 'center' }}>
             <Link component={RouterLink} to="/register" variant="body2">
@@ -119,4 +113,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

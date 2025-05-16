@@ -13,8 +13,7 @@ import {
   Alert,
 } from '@mui/material';
 import { RootState } from '../../store';
-import { loginStart, loginSuccess, loginFailure } from '../../store/slices/authSlice';
-import { register } from '../../services/api';
+import { register } from '../../store/slices/authSlice';
 
 const validationSchema = Yup.object({
   username: Yup.string()

@@ -1,23 +1,22 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
 import { Provider } from 'react-redux';
-import { theme } from './theme';
+
+import theme from './theme';
 import { store } from './store';
 
-// Layouts
-import MainLayout from './layouts/MainLayout';
+import MainLayout from './components/layouts/MainLayout';
+import PrivateRoute from './components/auth/PrivateRoute';
 
-// Pages
 import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Notes from './pages/Notes';
-import NoteDetail from './pages/NoteDetail';
-import Profile from './pages/Profile';
-
-// Components
-import PrivateRoute from './components/PrivateRoute';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import NotesList from './pages/notes/NotesList';
+import NoteEditor from './pages/notes/NoteEditor';
+import ContentProcessor from './pages/content/ContentProcessor';
+import Profile from './pages/profile/Profile';
 
 const App: React.FC = () => {
   return (
@@ -31,11 +30,40 @@ const App: React.FC = () => {
             <Route path="/register" element={<Register />} />
 
             {/* Protected routes */}
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
-              <Route path="/notes" element={<PrivateRoute><Notes /></PrivateRoute>} />
-              <Route path="/notes/:id" element={<PrivateRoute><NoteDetail /></PrivateRoute>} />
-              <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<Home />} />
+              <Route
+                path="notes"
+                element={
+                  <PrivateRoute>
+                    <NotesList />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="notes/:id"
+                element={
+                  <PrivateRoute>
+                    <NoteEditor />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="content"
+                element={
+                  <PrivateRoute>
+                    <ContentProcessor />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="profile"
+                element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                }
+              />
             </Route>
           </Routes>
         </Router>
@@ -44,4 +72,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App; 
+export default App;

@@ -1,5 +1,12 @@
 # AutoNote Architecture Design Document
 
+Copyright © 2025 SENTIENT SOLUTIONS LLC. All rights reserved.
+Created by Termaine "TJ" Jenkins
+
+CONFIDENTIAL AND PROPRIETARY
+This document contains confidential and proprietary information of SENTIENT SOLUTIONS LLC.
+No part of this document may be reproduced, distributed, or transmitted without explicit written permission.
+
 ## 1. Introduction
 
 ### 1.1 Purpose
@@ -231,4 +238,4 @@ class Content:
 ### 10.3 Deployment Diagrams
 - Development environment
 - Staging environment
-- Production environment 
+- Production environment

@@ -33,7 +33,7 @@ const validationSchema = Yup.object({
 const Register: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
   const formik = useFormik({
     initialValues: {
@@ -45,12 +45,10 @@ const Register: React.FC = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        dispatch(loginStart());
-        const response = await register(values.username, values.email, values.password);
-        dispatch(loginSuccess({ token: response.token }));
+        await dispatch(register({ username: values.username, email: values.email, password: values.password })).unwrap();
         navigate('/');
       } catch (err) {
-        dispatch(loginFailure(err instanceof Error ? err.message : 'Registration failed'));
+        // Error is handled by Redux state
       }
     },
   });
@@ -138,9 +136,9 @@ const Register: React.FC = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading ? 'Creating account...' : 'Sign Up'}
+            {isLoading ? 'Creating account...' : 'Sign Up'}
           </Button>
           <Box sx={{ textAlign: 'center' }}>
             <Link component={RouterLink} to="/login" variant="body2">

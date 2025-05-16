@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -38,7 +38,6 @@ const TabPanel = (props: TabPanelProps) => {
 
 const ContentProcessor: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

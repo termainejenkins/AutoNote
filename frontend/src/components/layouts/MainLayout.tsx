@@ -22,15 +22,14 @@ import {
   ExitToApp as LogoutIcon,
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { RootState, AppDispatch } from '../../store';
 import { logout } from '../../store/slices/authSlice';
 
 const drawerWidth = 240;
 
 const MainLayout: React.FC = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
   const [mobileOpen, setMobileOpen] = React.useState(false);
 

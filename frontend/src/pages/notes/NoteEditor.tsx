@@ -14,7 +14,7 @@ import {
   Autocomplete,
 } from '@mui/material';
 import { Editor } from '@tinymce/tinymce-react';
-import { RootState } from '../../store';
+import { RootState, AppDispatch } from '../../store';
 import { notesApi } from '../../services/api';
 import { fetchNotes } from '../../store/slices/notesSlice';
 
@@ -27,9 +27,8 @@ const validationSchema = Yup.object({
 const NoteEditor: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const dispatch = useDispatch();
-  const { loading, error } = useSelector((state: RootState) => state.notes);
-  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { isLoading, error } = useSelector((state: RootState) => state.notes);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formik = useFormik({
@@ -83,7 +82,7 @@ const NoteEditor: React.FC = () => {
     formik.setFieldValue('tags', newValue);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Box
         sx={{

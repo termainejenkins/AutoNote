@@ -18,8 +18,6 @@ import {
   ListItemText,
 } from '@mui/material';
 import {
-  Person as PersonIcon,
-  Email as EmailIcon,
   Note as NoteIcon,
   AccessTime as TimeIcon,
 } from '@mui/icons-material';

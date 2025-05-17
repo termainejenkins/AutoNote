@@ -18,10 +18,10 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 # Install Playwright browsers
-RUN playwright install chromium
+RUN playwright install --with-deps
 
 # Copy application code
 COPY . .

@@ -78,10 +78,7 @@ function NotesList() {
                 </Box>
               </CardContent>
               <CardActions>
-                <Button
-                  size="small"
-                  onClick={() => navigate(`/notes/${note.id}`)}
-                >
+                <Button size="small" onClick={() => navigate(`/notes/${note.id}`)}>
                   View Details
                 </Button>
               </CardActions>
@@ -93,4 +90,4 @@ function NotesList() {
   );
 }
 
-export default NotesList; 
+export default NotesList;

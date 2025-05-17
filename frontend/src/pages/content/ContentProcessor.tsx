@@ -71,11 +71,7 @@ const ContentProcessor: React.FC = () => {
 
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Tabs
-            value={tabValue}
-            onChange={handleTabChange}
-            aria-label="content type tabs"
-          >
+          <Tabs value={tabValue} onChange={handleTabChange} aria-label="content type tabs">
             <Tab label="Web Page" />
             <Tab label="PDF Document" />
           </Tabs>
@@ -100,11 +96,7 @@ const ContentProcessor: React.FC = () => {
             </Alert>
           )}
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ mt: 2 }}
-          >
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
             <TextField
               fullWidth
               label="URL"
@@ -116,11 +108,7 @@ const ContentProcessor: React.FC = () => {
             />
 
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={loading || !url}
-              >
+              <Button type="submit" variant="contained" disabled={loading || !url}>
                 {loading ? (
                   <>
                     <CircularProgress size={24} sx={{ mr: 1 }} />
@@ -130,11 +118,7 @@ const ContentProcessor: React.FC = () => {
                   'Process Content'
                 )}
               </Button>
-              <Button
-                variant="outlined"
-                onClick={() => navigate('/notes')}
-                disabled={loading}
-              >
+              <Button variant="outlined" onClick={() => navigate('/notes')} disabled={loading}>
                 Cancel
               </Button>
             </Box>
@@ -153,8 +137,7 @@ const ContentProcessor: React.FC = () => {
             • For PDFs, ensure the document is not password-protected
             <br />
             • Large documents may take longer to process
-            <br />
-            • The processed content will be available in the note editor
+            <br />• The processed content will be available in the note editor
           </Typography>
         </CardContent>
       </Card>
@@ -162,4 +145,4 @@ const ContentProcessor: React.FC = () => {
   );
 };
 
-export default ContentProcessor; 
+export default ContentProcessor;

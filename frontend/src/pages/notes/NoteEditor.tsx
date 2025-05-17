@@ -30,6 +30,7 @@ const NoteEditor: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { isLoading, error } = useSelector((state: RootState) => state.notes);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [suggestedTags] = useState<string[]>([]);
 
   const formik = useFormik({
     initialValues: {
@@ -131,15 +132,31 @@ const NoteEditor: React.FC = () => {
               height: 500,
               menubar: false,
               plugins: [
-                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                'advlist',
+                'autolink',
+                'lists',
+                'link',
+                'image',
+                'charmap',
+                'preview',
+                'anchor',
+                'searchreplace',
+                'visualblocks',
+                'code',
+                'fullscreen',
+                'insertdatetime',
+                'media',
+                'table',
+                'code',
+                'help',
+                'wordcount',
               ],
-              toolbar: 'undo redo | blocks | ' +
+              toolbar:
+                'undo redo | blocks | ' +
                 'bold italic forecolor | alignleft aligncenter ' +
                 'alignright alignjustify | bullist numlist outdent indent | ' +
                 'removeformat | help',
-              content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+              content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
             }}
           />
           {formik.touched.content && formik.errors.content && (
@@ -158,11 +175,7 @@ const NoteEditor: React.FC = () => {
           freeSolo
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
-              <Chip
-                label={option}
-                {...getTagProps({ index })}
-                key={option}
-              />
+              <Chip label={option} {...getTagProps({ index })} key={option} />
             ))
           }
           renderInput={(params) => (
@@ -178,17 +191,10 @@ const NoteEditor: React.FC = () => {
         />
 
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
-            variant="contained"
-            type="submit"
-            disabled={isSubmitting}
-          >
+          <Button variant="contained" type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Saving...' : 'Save Note'}
           </Button>
-          <Button
-            variant="outlined"
-            onClick={() => navigate('/notes')}
-          >
+          <Button variant="outlined" onClick={() => navigate('/notes')}>
             Cancel
           </Button>
         </Box>
@@ -197,4 +203,4 @@ const NoteEditor: React.FC = () => {
   );
 };
 
-export default NoteEditor; 
+export default NoteEditor;

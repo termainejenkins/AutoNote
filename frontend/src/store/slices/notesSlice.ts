@@ -15,10 +15,13 @@ export const fetchNotes = createAsyncThunk('notes/fetchNotes', async () => {
   return response;
 });
 
-export const createNote = createAsyncThunk('notes/createNote', async (data: { title: string; content: string; tags?: string[] }) => {
-  const response = await notesApi.createNote(data);
-  return response;
-});
+export const createNote = createAsyncThunk(
+  'notes/createNote',
+  async (data: { title: string; content: string; tags?: string[] }) => {
+    const response = await notesApi.createNote(data);
+    return response;
+  }
+);
 
 export const updateNote = createAsyncThunk(
   'notes/updateNote',

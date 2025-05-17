@@ -31,12 +31,12 @@ function Dashboard() {
     try {
       const response = await axios.get('http://localhost:8000/notes/');
       const notes = response.data;
-      
+
       setStats({
         totalNotes: notes.length,
-        webNotes: notes.filter(note => note.source_type === 'web').length,
-        videoNotes: notes.filter(note => note.source_type === 'video').length,
-        courseraNotes: notes.filter(note => note.source_type === 'coursera').length,
+        webNotes: notes.filter((note) => note.source_type === 'web').length,
+        videoNotes: notes.filter((note) => note.source_type === 'video').length,
+        courseraNotes: notes.filter((note) => note.source_type === 'coursera').length,
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -52,9 +52,7 @@ function Dashboard() {
             {value}
           </Typography>
         </Box>
-        <Typography color="text.secondary">
-          {title}
-        </Typography>
+        <Typography color="text.secondary">{title}</Typography>
       </CardContent>
     </Card>
   );
@@ -150,4 +148,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard; 
+export default Dashboard;

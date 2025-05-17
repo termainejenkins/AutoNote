@@ -1,12 +1,6 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-} from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import NoteAltIcon from '@mui/icons-material/NoteAlt';
 
 function Navbar() {
@@ -27,18 +21,10 @@ function Navbar() {
           AutoNote
         </Typography>
         <Box>
-          <Button
-            color="inherit"
-            component={RouterLink}
-            to="/"
-          >
+          <Button color="inherit" component={RouterLink} to="/">
             Dashboard
           </Button>
-          <Button
-            color="inherit"
-            component={RouterLink}
-            to="/notes"
-          >
+          <Button color="inherit" component={RouterLink} to="/notes">
             My Notes
           </Button>
         </Box>
@@ -47,4 +33,4 @@ function Navbar() {
   );
 }
 
-export default Navbar; 
+export default Navbar;

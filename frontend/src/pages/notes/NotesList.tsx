@@ -78,8 +78,7 @@ const NotesList: React.FC = () => {
         note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         note.content.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesTags =
-        selectedTags.length === 0 ||
-        selectedTags.every((tag) => note.tags?.includes(tag));
+        selectedTags.length === 0 || selectedTags.every((tag) => note.tags?.includes(tag));
       return matchesSearch && matchesTags;
     })
     .sort((a: Note, b: Note) => {
@@ -116,11 +115,7 @@ const NotesList: React.FC = () => {
     <Box sx={{ flexGrow: 1, p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">My Notes</Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleCreateNote}
-        >
+        <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreateNote}>
           New Note
         </Button>
       </Box>
@@ -144,18 +139,10 @@ const NotesList: React.FC = () => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                variant="outlined"
-                startIcon={<FilterIcon />}
-                onClick={handleFilterClick}
-              >
+              <Button variant="outlined" startIcon={<FilterIcon />} onClick={handleFilterClick}>
                 Filter
               </Button>
-              <Button
-                variant="outlined"
-                startIcon={<SortIcon />}
-                onClick={handleSortClick}
-              >
+              <Button variant="outlined" startIcon={<SortIcon />} onClick={handleSortClick}>
                 Sort
               </Button>
             </Box>
@@ -232,11 +219,7 @@ const NotesList: React.FC = () => {
         ))}
       </Grid>
 
-      <Menu
-        anchorEl={filterAnchorEl}
-        open={Boolean(filterAnchorEl)}
-        onClose={handleFilterClose}
-      >
+      <Menu anchorEl={filterAnchorEl} open={Boolean(filterAnchorEl)} onClose={handleFilterClose}>
         {allTags.map((tag) => (
           <MenuItem
             key={tag}
@@ -248,11 +231,7 @@ const NotesList: React.FC = () => {
         ))}
       </Menu>
 
-      <Menu
-        anchorEl={sortAnchorEl}
-        open={Boolean(sortAnchorEl)}
-        onClose={handleSortClose}
-      >
+      <Menu anchorEl={sortAnchorEl} open={Boolean(sortAnchorEl)} onClose={handleSortClose}>
         <MenuItem onClick={() => handleSortChange('newest')}>Newest First</MenuItem>
         <MenuItem onClick={() => handleSortChange('oldest')}>Oldest First</MenuItem>
         <MenuItem onClick={() => handleSortChange('title')}>Title</MenuItem>

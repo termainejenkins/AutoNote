@@ -16,7 +16,12 @@ const renderWithProviders = (
   component: React.ReactElement,
   initialState = {
     auth: {
-      user: { id: 1, username: 'testuser', email: 'test@example.com', created_at: new Date().toISOString() },
+      user: {
+        id: 1,
+        username: 'testuser',
+        email: 'test@example.com',
+        created_at: new Date().toISOString(),
+      },
       isAuthenticated: true,
       token: 'test-token',
       isLoading: false,
@@ -40,9 +45,7 @@ const renderWithProviders = (
 
   return render(
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        {component}
-      </ThemeProvider>
+      <ThemeProvider theme={theme}>{component}</ThemeProvider>
     </Provider>
   );
 };
@@ -50,12 +53,13 @@ const renderWithProviders = (
 describe('Profile Component', () => {
   it('renders the profile form with user data', () => {
     renderWithProviders(<Profile />);
-    
+
     expect(screen.getByLabelText(/username/i)).toHaveValue('testuser');
     expect(screen.getByLabelText(/email/i)).toHaveValue('test@example.com');
-  });  it('shows validation errors for invalid input', async () => {
+  });
+  it('shows validation errors for invalid input', async () => {
     renderWithProviders(<Profile />);
-    
+
     const emailInput = screen.getByLabelText(/email/i);
     await user.type(emailInput, 'invalid-email');
     await user.tab();
@@ -68,7 +72,7 @@ describe('Profile Component', () => {
 
   it('shows password fields', () => {
     renderWithProviders(<Profile />);
-    
+
     expect(screen.getByLabelText(/current password/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/new password/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm.*password/i)).toBeInTheDocument();
@@ -76,7 +80,7 @@ describe('Profile Component', () => {
 
   it('displays statistics', () => {
     renderWithProviders(<Profile />);
-    
+
     expect(screen.getByText(/total notes/i)).toBeInTheDocument();
     expect(screen.getByText(/last active/i)).toBeInTheDocument();
     expect(screen.getByText(/average notes per day/i)).toBeInTheDocument();

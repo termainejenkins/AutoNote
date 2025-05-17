@@ -35,4 +35,4 @@ export const useApiError = () => {
     handleError,
     clearError,
   };
-}; 
+};

@@ -3,25 +3,15 @@ import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import {
-  Box,
-  Button,
-  Container,
-  Link,
-  TextField,
-  Typography,
-  Alert,
-} from '@mui/material';
-import { RootState } from '../../store';
+import { Box, Button, Container, Link, TextField, Typography, Alert } from '@mui/material';
+import { RootState, AppDispatch } from '../../store';
 import { register } from '../../store/slices/authSlice';
 
 const validationSchema = Yup.object({
   username: Yup.string()
     .min(3, 'Username should be of minimum 3 characters length')
     .required('Username is required'),
-  email: Yup.string()
-    .email('Enter a valid email')
-    .required('Email is required'),
+  email: Yup.string().email('Enter a valid email').required('Email is required'),
   password: Yup.string()
     .min(8, 'Password should be of minimum 8 characters length')
     .required('Password is required'),
@@ -32,7 +22,7 @@ const validationSchema = Yup.object({
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
   const formik = useFormik({
@@ -45,7 +35,9 @@ const Register: React.FC = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        await dispatch(register({ username: values.username, email: values.email, password: values.password })).unwrap();
+        await dispatch(
+          register({ username: values.username, email: values.email, password: values.password })
+        ).unwrap();
         navigate('/');
       } catch (err) {
         // Error is handled by Redux state
@@ -71,11 +63,7 @@ const Register: React.FC = () => {
             {error}
           </Alert>
         )}
-        <Box
-          component="form"
-          onSubmit={formik.handleSubmit}
-          sx={{ mt: 1, width: '100%' }}
-        >
+        <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 1, width: '100%' }}>
           <TextField
             margin="normal"
             required
@@ -151,4 +139,4 @@ const Register: React.FC = () => {
   );
 };
 
-export default Register; 
+export default Register;

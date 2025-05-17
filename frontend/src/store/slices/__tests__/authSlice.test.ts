@@ -9,7 +9,7 @@ jest.mock('../../../services/api', () => ({
     login: jest.fn(),
     updateUser: jest.fn(),
     updatePassword: jest.fn(),
-  }
+  },
 }));
 
 type RootState = ReturnType<typeof store.getState>;
@@ -36,7 +36,8 @@ describe('Auth Slice', () => {
     const mockCredentials = {
       email: 'test@example.com',
       password: 'password123',
-    };    const mockResponse = {
+    };
+    const mockResponse = {
       user: {
         id: '1',
         email: 'test@example.com',
@@ -83,7 +84,8 @@ describe('Auth Slice', () => {
           auth: authReducer,
         },
         preloadedState: {
-          auth: {            user: {
+          auth: {
+            user: {
               id: '1',
               username: 'testuser',
               email: 'test@example.com',
@@ -101,7 +103,9 @@ describe('Auth Slice', () => {
     it('handles successful user update', async () => {
       (authApi.updateUser as jest.Mock).mockResolvedValue(mockUser);
 
-      await store.dispatch(updateUser({ id: mockUser.id, username: mockUser.username, email: mockUser.email }));
+      await store.dispatch(
+        updateUser({ id: mockUser.id, username: mockUser.username, email: mockUser.email })
+      );
       const state = store.getState() as { auth: AuthState };
 
       expect(state.auth.user).toEqual(mockUser);
@@ -112,7 +116,9 @@ describe('Auth Slice', () => {
       const errorMessage = 'Update failed';
       (authApi.updateUser as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
-      await store.dispatch(updateUser({ id: mockUser.id, username: mockUser.username, email: mockUser.email }));
+      await store.dispatch(
+        updateUser({ id: mockUser.id, username: mockUser.username, email: mockUser.email })
+      );
       const state = store.getState() as { auth: AuthState };
 
       expect(state.auth.error).toContain(errorMessage);

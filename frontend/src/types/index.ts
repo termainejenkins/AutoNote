@@ -43,4 +43,4 @@ export interface ContentProcessRequest {
 export interface AIProcessRequest {
   content: string;
   operation: 'summarize' | 'extract' | 'questions';
-} 
+}

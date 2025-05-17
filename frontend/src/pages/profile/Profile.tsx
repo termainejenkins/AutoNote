@@ -17,10 +17,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import {
-  Note as NoteIcon,
-  AccessTime as TimeIcon,
-} from '@mui/icons-material';
+import { Note as NoteIcon, AccessTime as TimeIcon } from '@mui/icons-material';
 import { RootState, AppDispatch } from '../../store';
 import { updateUser } from '../../store/slices/authSlice';
 import { authApi } from '../../services/api';
@@ -38,37 +35,44 @@ const validationSchema = Yup.object().shape({
   username: Yup.string()
     .min(3, 'Username should be of minimum 3 characters length')
     .max(30, 'Username should be of maximum 30 characters length')
-    .matches(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores and hyphens')
+    .matches(
+      /^[a-zA-Z0-9_-]+$/,
+      'Username can only contain letters, numbers, underscores and hyphens'
+    )
     .required('Username is required'),
   email: Yup.string()
     .email('Enter a valid email')
     .required('Email is required')
     .max(255, 'Email is too long'),
-  currentPassword: Yup.string()
-    .when('newPassword', {
-      is: (val: string) => val && val.length > 0,
-      then: (schema) => schema.required('Current password is required')
+  currentPassword: Yup.string().when('newPassword', {
+    is: (val: string) => val && val.length > 0,
+    then: (schema) =>
+      schema
+        .required('Current password is required')
         .min(8, 'Password should be of minimum 8 characters length'),
-      otherwise: (schema) => schema
-    }),
+    otherwise: (schema) => schema,
+  }),
   newPassword: Yup.string()
-    .test('different', 'New password must be different from current password',
-      function(value) {
-        return !value || value !== this.parent.currentPassword;
-      })
-    .test('complexity', 'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',
-      function(value) {
+    .test('different', 'New password must be different from current password', function (value) {
+      return !value || value !== this.parent.currentPassword;
+    })
+    .test(
+      'complexity',
+      'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',
+      function (value) {
         if (!value) return true;
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         return regex.test(value);
-      }),
-  confirmPassword: Yup.string()
-    .when('newPassword', {
-      is: (val: string) => val && val.length > 0,
-      then: (schema) => schema.required('Confirm password is required')
+      }
+    ),
+  confirmPassword: Yup.string().when('newPassword', {
+    is: (val: string) => val && val.length > 0,
+    then: (schema) =>
+      schema
+        .required('Confirm password is required')
         .oneOf([Yup.ref('newPassword')], 'Passwords must match'),
-      otherwise: (schema) => schema
-    })
+    otherwise: (schema) => schema,
+  }),
 });
 
 const Profile: React.FC = () => {
@@ -91,9 +95,9 @@ const Profile: React.FC = () => {
       try {
         setError(null);
         setSuccess(null);
-        
+
         const updates: Partial<User> = {};
-        
+
         if (values.username !== user?.username) {
           updates.username = values.username;
         }
@@ -103,10 +107,12 @@ const Profile: React.FC = () => {
 
         // Only dispatch update if there are profile changes
         if (Object.keys(updates).length > 0) {
-          await dispatch(updateUser({
-            id: user?.id || '',
-            ...updates
-          })).unwrap();
+          await dispatch(
+            updateUser({
+              id: user?.id || '',
+              ...updates,
+            })
+          ).unwrap();
         }
 
         // Handle password update if new password is provided
@@ -128,19 +134,24 @@ const Profile: React.FC = () => {
         console.error('Failed to update profile:', err);
       }
     },
-  });  const calculateStats = () => {
+  });
+  const calculateStats = () => {
     const totalNotes = notes.length;
     const now = new Date();
-    const oldestNoteDate = notes.length > 0 
-      ? new Date(Math.min(...notes.map(note => new Date(note.created_at).getTime())))
-      : now;
-    
-    const daysSinceFirstNote = Math.max(1, Math.ceil((now.getTime() - oldestNoteDate.getTime()) / (1000 * 60 * 60 * 24)));
-    
+    const oldestNoteDate =
+      notes.length > 0
+        ? new Date(Math.min(...notes.map((note) => new Date(note.created_at).getTime())))
+        : now;
+
+    const daysSinceFirstNote = Math.max(
+      1,
+      Math.ceil((now.getTime() - oldestNoteDate.getTime()) / (1000 * 60 * 60 * 24))
+    );
+
     return {
       totalNotes,
       lastActive: now.toLocaleDateString(), // Using current date since we don't track last active
-      averageNotesPerDay: (totalNotes / daysSinceFirstNote).toFixed(1)
+      averageNotesPerDay: (totalNotes / daysSinceFirstNote).toFixed(1),
     };
   };
 
@@ -246,11 +257,7 @@ const Profile: React.FC = () => {
                   sx={{ mb: 2 }}
                 />
 
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={isLoading}
-                >
+                <Button type="submit" variant="contained" disabled={isLoading}>
                   {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </Box>
@@ -269,20 +276,14 @@ const Profile: React.FC = () => {
                   <ListItemIcon>
                     <NoteIcon />
                   </ListItemIcon>
-                  <ListItemText
-                    primary="Total Notes"
-                    secondary={stats.totalNotes}
-                  />
+                  <ListItemText primary="Total Notes" secondary={stats.totalNotes} />
                 </ListItem>
                 <Divider />
                 <ListItem>
                   <ListItemIcon>
                     <TimeIcon />
                   </ListItemIcon>
-                  <ListItemText
-                    primary="Last Active"
-                    secondary={stats.lastActive}
-                  />
+                  <ListItemText primary="Last Active" secondary={stats.lastActive} />
                 </ListItem>
                 <Divider />
                 <ListItem>

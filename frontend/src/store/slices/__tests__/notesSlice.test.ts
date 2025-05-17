@@ -109,7 +109,7 @@ describe('Notes Slice', () => {
       await store.dispatch(updateNote(mockUpdate));
       const state = store.getState().notes;
 
-      const updatedNote = state.items.find(note => note.id === '1');
+      const updatedNote = state.items.find((note) => note.id === '1');
       expect(updatedNote).toEqual(mockResponse);
     });
   });
@@ -126,14 +126,16 @@ describe('Notes Slice', () => {
         },
         preloadedState: {
           notes: {
-            items: [{
-              id: noteId,
-              title: 'Test Note',
-              content: 'Content',
-              tags: ['test'],
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            }],
+            items: [
+              {
+                id: noteId,
+                title: 'Test Note',
+                content: 'Content',
+                tags: ['test'],
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              },
+            ],
             error: null,
             isLoading: false,
           },

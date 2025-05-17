@@ -1,27 +1,19 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-  CircularProgress,
-} from '@mui/material';
+import { Box, Button, Card, CardContent, Grid, Typography, CircularProgress } from '@mui/material';
 import {
   Add as AddIcon,
   Description as NoteIcon,
   Web as WebIcon,
   PictureAsPdf as PdfIcon,
 } from '@mui/icons-material';
-import { RootState } from '../store';
+import { RootState, AppDispatch } from '../store';
 import { fetchNotes } from '../store/slices/notesSlice';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { items: notes, isLoading } = useSelector((state: RootState) => state.notes);
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -66,11 +58,7 @@ const Home: React.FC = () => {
                 Quick Actions
               </Typography>
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={handleCreateNote}
-                >
+                <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreateNote}>
                   New Note
                 </Button>
                 <Button
@@ -145,4 +133,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home; 
+export default Home;

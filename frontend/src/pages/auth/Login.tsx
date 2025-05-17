@@ -3,22 +3,12 @@ import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import {
-  Box,
-  Button,
-  Container,
-  Link,
-  TextField,
-  Typography,
-  Alert,
-} from '@mui/material';
+import { Box, Button, Container, Link, TextField, Typography, Alert } from '@mui/material';
 import { AppDispatch, RootState } from '../../store';
 import { login } from '../../store/slices/authSlice';
 
 const validationSchema = Yup.object({
-  email: Yup.string()
-    .email('Enter a valid email')
-    .required('Email is required'),
+  email: Yup.string().email('Enter a valid email').required('Email is required'),
   password: Yup.string()
     .min(8, 'Password should be of minimum 8 characters length')
     .required('Password is required'),

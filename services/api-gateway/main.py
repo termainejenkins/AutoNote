@@ -66,56 +66,73 @@ async def forward_request(request, call_next):
     # Get the target service from the path
     path = request.url.path
     service = path.split("/")[1] if len(path.split("/")) > 1 else None
-    
+
+    # Handle CORS preflight (OPTIONS) requests
+    if request.method == "OPTIONS":
+        response = JSONResponse(content={"detail": "CORS preflight"}, status_code=200)
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response.headers["Access-Control-Allow-Methods"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response
+
     if service in SERVICE_URLS:
         try:
             # Forward the request to the appropriate service
             async with httpx.AsyncClient() as client:
                 target_url = f"{SERVICE_URLS[service]}{path}"
+                # Forward all headers, including Authorization
+                headers = dict(request.headers)
                 response = await client.request(
                     method=request.method,
                     url=target_url,
-                    headers=dict(request.headers),
+                    headers=headers,
                     params=dict(request.query_params),
                     content=await request.body()
                 )
-                
                 # Record metrics
                 REQUEST_COUNT.labels(
                     method=request.method,
                     endpoint=path,
                     status=response.status_code
                 ).inc()
-                
                 REQUEST_LATENCY.labels(
                     method=request.method,
                     endpoint=path
                 ).observe(time.time() - start_time)
-                
-                return JSONResponse(
-                    content=response.json(),
+                # Prepare response
+                content_type = response.headers.get("content-type", "application/json")
+                gateway_response = JSONResponse(
+                    content=response.json() if "application/json" in content_type else response.text,
                     status_code=response.status_code,
-                    headers=dict(response.headers)
                 )
+                # Set CORS headers
+                gateway_response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+                gateway_response.headers["Access-Control-Allow-Credentials"] = "true"
+                gateway_response.headers["Access-Control-Allow-Methods"] = "*"
+                gateway_response.headers["Access-Control-Allow-Headers"] = "*"
+                return gateway_response
         except Exception as e:
             logger.error(f"Error forwarding request to {service}: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Error forwarding request to {service}")
-    
+
     # If no service is specified, proceed with normal request handling
     response = await call_next(request)
-    
+    # Set CORS headers for non-forwarded requests
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "*"
     # Record metrics for non-forwarded requests
     REQUEST_COUNT.labels(
         method=request.method,
         endpoint=path,
         status=response.status_code
     ).inc()
-    
     REQUEST_LATENCY.labels(
         method=request.method,
         endpoint=path
     ).observe(time.time() - start_time)
-    
     return response
 
 # Error handling

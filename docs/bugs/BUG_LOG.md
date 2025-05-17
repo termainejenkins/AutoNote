@@ -139,6 +139,92 @@ Solution implemented
 #### Prevention
 Prevention measures
 
+### [BUG-002] CORS Error: Frontend-Backend Communication Blocked
+#### Status
+- [ ] New
+- [ ] In Progress
+- [x] Fixed
+- [x] Verified
+- [x] Closed
+
+#### Priority
+- [x] High
+- [ ] Medium
+- [ ] Low
+
+#### Environment
+- OS: All
+- Browser: All
+- Version: All
+- Service: API Gateway (Backend)
+
+#### Description
+Frontend requests to the backend (API Gateway) were blocked by the browser due to missing CORS headers, resulting in errors like:
+"Access to XMLHttpRequest at 'http://localhost:8000/notes' from origin 'http://localhost:3000' has been blocked by CORS policy."
+
+#### Steps to Reproduce
+1. Start frontend and backend separately
+2. Attempt to access backend API from frontend
+3. Observe CORS error in browser console
+
+#### Expected Behavior
+Frontend should be able to communicate with backend API
+
+#### Actual Behavior
+Requests are blocked by browser CORS policy
+
+#### Root Cause
+CORS middleware in the API Gateway was not configured to allow requests from the frontend origin
+
+#### Solution
+Configured FastAPI's CORSMiddleware in the API Gateway to allow requests from 'http://localhost:3000'
+
+#### Prevention
+- Always configure CORS for local development and production
+- Document CORS setup in backend service guides
+
+### [BUG-003] Prettier/Line Ending Build Failure in Docker
+#### Status
+- [ ] New
+- [ ] In Progress
+- [x] Fixed
+- [x] Verified
+- [x] Closed
+
+#### Priority
+- [x] High
+- [ ] Medium
+- [ ] Low
+
+#### Environment
+- OS: Windows (with Docker)
+- Service: Frontend (React)
+
+#### Description
+Docker build failed due to Prettier errors about CRLF (Windows) line endings, e.g.:
+"Delete `␍` prettier/prettier"
+
+#### Steps to Reproduce
+1. Edit files on Windows (default CRLF line endings)
+2. Run 'docker-compose up --build'
+3. Observe build failure due to Prettier errors
+
+#### Expected Behavior
+Build should succeed regardless of OS line endings
+
+#### Actual Behavior
+Build fails due to line ending mismatch
+
+#### Root Cause
+Files had CRLF line endings, but Prettier and Docker (Linux) expect LF
+
+#### Solution
+Ran 'npx prettier --write .' in the frontend directory to convert all files to LF
+
+#### Prevention
+- Added instructions to use Prettier to fix line endings
+- Recommended setting Git to use LF via core.autocrlf or .gitattributes
+
 ## Bug Categories
 
 ### Critical

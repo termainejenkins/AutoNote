@@ -17,6 +17,9 @@
 2. Verify Docker containers are running
 3. Check service health status
 
+- **To start the full stack (frontend + backend + all services), run `docker-compose up --build` from the project root.**
+- **The app is confirmed to be working end-to-end after resolving CORS and line ending issues.**
+
 ## Frontend Features & Usage (2024 Update)
 
 - **Authentication:** Register and log in to access the app. Protected routes ensure only authenticated users can access notes, content processing, and profile pages.

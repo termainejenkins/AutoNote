@@ -56,6 +56,16 @@ autonote/
    .\scripts\test-services.ps1
    ```
 
+## Quick Start
+
+**To start the full stack (frontend + backend + all services), run:**
+
+```
+docker-compose up --build
+```
+
+from the project root. The app is confirmed to be working end-to-end after resolving CORS and line ending issues.
+
 ## Service Ports
 
 - API Gateway: http://localhost:8000

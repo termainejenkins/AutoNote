@@ -18,7 +18,8 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN pip install --no-cache-dir --upgrade --force-reinstall -r requirements.txt \
+    && python -c "import pyee; print('pyee version:', pyee.__version__)"
 
 # Install Playwright browsers
 RUN playwright install --with-deps

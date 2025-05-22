@@ -21,12 +21,6 @@ import Profile from './pages/profile/Profile';
 
 // Placeholder components - these should be created in separate files
 const Dashboard = () => <div>Dashboard Page</div>;
-const Notes = () => <div>Notes Page</div>;
-
-const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const token = localStorage.getItem('token');
-  return token ? <>{children}</> : <Navigate to="/login" />;
-};
 
 const App: React.FC = () => {
   return (
@@ -82,14 +76,6 @@ const App: React.FC = () => {
               element={
                 <PrivateRoute>
                   <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="notes"
-              element={
-                <PrivateRoute>
-                  <Notes />
                 </PrivateRoute>
               }
             />

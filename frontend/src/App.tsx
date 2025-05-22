@@ -1,8 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import { Provider } from 'react-redux';
+import { authApi } from './services/api';
 
 import theme from './theme';
 import { store } from './store';
@@ -17,6 +18,15 @@ import NotesList from './pages/notes/NotesList';
 import NoteEditor from './pages/notes/NoteEditor';
 import ContentProcessor from './pages/content/ContentProcessor';
 import Profile from './pages/profile/Profile';
+
+// Placeholder components - these should be created in separate files
+const Dashboard = () => <div>Dashboard Page</div>;
+const Notes = () => <div>Notes Page</div>;
+
+const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const token = localStorage.getItem('token');
+  return token ? <>{children}</> : <Navigate to="/login" />;
+};
 
 const App: React.FC = () => {
   return (
@@ -65,6 +75,25 @@ const App: React.FC = () => {
                 }
               />
             </Route>
+
+            {/* Placeholder routes */}
+            <Route
+              path="dashboard"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="notes"
+              element={
+                <PrivateRoute>
+                  <Notes />
+                </PrivateRoute>
+              }
+            />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
           </Routes>
         </Router>
       </ThemeProvider>

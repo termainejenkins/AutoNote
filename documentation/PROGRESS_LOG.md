@@ -1,4 +1,4 @@
-# AutoNote Project Progress Log
+                                                # AutoNote Project Progress Log
 
 ## Overview
 This document tracks the development progress of the AutoNote application, including completed features, ongoing work, and planned tasks.
@@ -102,10 +102,36 @@ This document tracks the development progress of the AutoNote application, inclu
 
 ## Next Steps
 1. Polish and complete any missing features (advanced note organization, AI features, etc.)
+   - [ ] Implement advanced note organization (folders, tags, search improvements)
+   - [ ] Finalize AI features (summarization, key point extraction, question generation)
+   - [ ] Complete and test the ContentProcessor and Dashboard pages
+   - [ ] Ensure protected routes and user profile management are robust
 2. Expand frontend and backend test coverage (unit, integration, E2E)
+   - [ ] Write unit tests for backend services
+   - [ ] Write unit tests for frontend components
+   - [ ] Implement integration tests for service interactions
+   - [ ] Add end-to-end (E2E) tests for full user flows
 3. Improve accessibility and user experience
+   - [ ] Audit and improve accessibility (a11y) across the app
+   - [ ] Add user feedback (toasts, error messages, loading spinners)
+   - [ ] Polish UI for usability and responsiveness
 4. Update documentation
+   - [ ] Restore or update architecture, requirements, and prompting guides as needed
+   - [ ] Add or update API documentation
+   - [ ] Update user and deployment guides
 5. Prepare for deployment and automate CI/CD
+   - [ ] Review and finalize Docker and docker-compose setups
+   - [ ] Ensure environment variables are production-ready
+   - [ ] Set up or refine CI/CD pipelines for all services
+   - [ ] Prepare for production deployment (infrastructure, monitoring, rollback procedures)
+
+### Immediate Priorities Checklist
+- [ ] Test and debug the full authentication and note-taking flow from frontend to backend
+- [ ] Fix any integration issues between frontend and backend services
+- [ ] Implement and test content extraction and AI summarization features
+- [ ] Begin browser extension MVP: set up project, implement basic content capture, connect to API
+- [ ] Expand and run automated tests (unit, integration, E2E)
+- [ ] Update documentation to reflect current architecture and next steps
 
 ## Notes
 - All core services are now containerized and can be run locally using Docker Compose

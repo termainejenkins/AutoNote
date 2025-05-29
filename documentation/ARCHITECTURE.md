@@ -251,3 +251,16 @@ class Content:
 - Development environment
 - Staging environment
 - Production environment
+
+## Current Development Focus
+
+The following areas are the current focus for the AutoNote team, ensuring the architecture is realized as planned and the system is robust, scalable, and user-friendly:
+
+- Test and debug the full authentication and note-taking flow from frontend to backend
+- Fix any integration issues between frontend and backend services
+- Implement and test content extraction and AI summarization features
+- Begin browser extension MVP: set up project, implement basic content capture, connect to API
+- Expand and run automated tests (unit, integration, E2E)
+- Update documentation to reflect current architecture and next steps
+
+For a detailed, actionable checklist and broader roadmap, see the PROGRESS_LOG.md.

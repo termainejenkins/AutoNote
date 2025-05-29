@@ -49,10 +49,28 @@ const renderWithProviders = (component: React.ReactElement, initialState = {
 };
 
 describe('NotesList Integration', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('fetches and displays notes', async () => {
     renderWithProviders(<NotesList />);
     expect(await screen.findByText('Note 1')).toBeInTheDocument();
     expect(screen.getByText('Note 2')).toBeInTheDocument();
+  });
+
+  it('shows error if notes fetch fails', async () => {
+    const { notesApi } = require('../../../services/api');
+    notesApi.getNotes.mockRejectedValueOnce(new Error('Fetch failed'));
+    renderWithProviders(<NotesList />);
+    expect(await screen.findByText(/error/i)).toBeInTheDocument();
+  });
+
+  it('shows empty state if no notes', async () => {
+    const { notesApi } = require('../../../services/api');
+    notesApi.getNotes.mockResolvedValueOnce([]);
+    renderWithProviders(<NotesList />);
+    expect(await screen.findByText(/no notes/i)).toBeInTheDocument();
   });
 
   it('creates a new note and updates the list', async () => {
@@ -66,5 +84,29 @@ describe('NotesList Integration', () => {
     const saveButton = screen.getByRole('button', { name: /save/i });
     await user.click(saveButton);
     await waitFor(() => expect(screen.getByText('Note 3')).toBeInTheDocument());
+  });
+
+  it('shows error if note creation fails', async () => {
+    const { notesApi } = require('../../../services/api');
+    notesApi.createNote.mockRejectedValueOnce(new Error('Create failed'));
+    renderWithProviders(<NotesList />);
+    const addButton = await screen.findByRole('button', { name: /add note/i });
+    await user.click(addButton);
+    const titleInput = screen.getByLabelText(/title/i);
+    await user.type(titleInput, 'Note 4');
+    const contentInput = screen.getByLabelText(/content/i);
+    await user.type(contentInput, 'Content 4');
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    await user.click(saveButton);
+    expect(await screen.findByText(/error/i)).toBeInTheDocument();
+  });
+
+  it('shows validation error if title is missing', async () => {
+    renderWithProviders(<NotesList />);
+    const addButton = await screen.findByRole('button', { name: /add note/i });
+    await user.click(addButton);
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    await user.click(saveButton);
+    expect(await screen.findByText(/title.*required/i)).toBeInTheDocument();
   });
 }); 

@@ -22,3 +22,17 @@ def test_register_and_login(user_data):
     headers = {"Authorization": f"Bearer {token}"}
     response = client.get("/notes", headers=headers)
     assert response.status_code == 200 or response.status_code == 404  # 404 if no notes yet 
+
+def test_register_existing_email(user_data):
+    client.post("/auth/register", json=user_data)
+    response = client.post("/auth/register", json=user_data)
+    assert response.status_code == 400 or response.status_code == 409
+
+def test_login_wrong_password(user_data):
+    client.post("/auth/register", json=user_data)
+    response = client.post("/auth/login", json={"email": user_data["email"], "password": "wrongpass"})
+    assert response.status_code == 401
+
+def test_protected_endpoint_no_token():
+    response = client.get("/notes")
+    assert response.status_code == 401 

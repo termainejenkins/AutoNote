@@ -31,4 +31,27 @@ def test_note_crud(auth_token):
     assert response.status_code == 200
     # Delete note
     response = client.delete(f"/notes/{note_id}", headers=headers)
-    assert response.status_code == 200 
+    assert response.status_code == 200
+
+def test_create_note_missing_title(auth_token):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    note_data = {"content": "No title"}
+    response = client.post("/notes", json=note_data, headers=headers)
+    assert response.status_code == 422 or response.status_code == 400
+
+def test_update_note_invalid_id(auth_token):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    update_data = {"title": "Updated", "content": "Updated content."}
+    response = client.put("/notes/invalid-id", json=update_data, headers=headers)
+    assert response.status_code == 404 or response.status_code == 422
+
+def test_delete_note_invalid_id(auth_token):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    response = client.delete("/notes/invalid-id", headers=headers)
+    assert response.status_code == 404 or response.status_code == 422
+
+def test_get_notes_list(auth_token):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    response = client.get("/notes", headers=headers)
+    assert response.status_code == 200
+    assert isinstance(response.json(), list) 

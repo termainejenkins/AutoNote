@@ -51,6 +51,10 @@ const renderWithProviders = (component: React.ReactElement, initialState = {
 };
 
 describe('Login Integration', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('logs in successfully with correct credentials', async () => {
     renderWithProviders(<Login />);
     await user.type(screen.getByLabelText(/email/i), 'test@example.com');
@@ -65,5 +69,40 @@ describe('Login Integration', () => {
     await user.type(screen.getByLabelText(/password/i), 'wrongpass');
     await user.click(screen.getByRole('button', { name: /login/i }));
     await waitFor(() => expect(screen.getByText(/invalid/i)).toBeInTheDocument());
+  });
+
+  it('shows error if API is down', async () => {
+    const { authApi } = require('../../../services/api');
+    authApi.login.mockRejectedValueOnce(new Error('Network error'));
+    renderWithProviders(<Login />);
+    await user.type(screen.getByLabelText(/email/i), 'test@example.com');
+    await user.type(screen.getByLabelText(/password/i), 'testpass123');
+    await user.click(screen.getByRole('button', { name: /login/i }));
+    expect(await screen.findByText(/error/i)).toBeInTheDocument();
+  });
+
+  it('shows validation error if email is missing', async () => {
+    renderWithProviders(<Login />);
+    await user.type(screen.getByLabelText(/password/i), 'testpass123');
+    await user.click(screen.getByRole('button', { name: /login/i }));
+    expect(await screen.findByText(/email.*required/i)).toBeInTheDocument();
+  });
+
+  it('shows validation error if password is missing', async () => {
+    renderWithProviders(<Login />);
+    await user.type(screen.getByLabelText(/email/i), 'test@example.com');
+    await user.click(screen.getByRole('button', { name: /login/i }));
+    expect(await screen.findByText(/password.*required/i)).toBeInTheDocument();
+  });
+
+  it('shows loading state during login', async () => {
+    const { authApi } = require('../../../services/api');
+    authApi.login.mockImplementationOnce(() => new Promise(resolve => setTimeout(() => resolve({ access_token: 'mock-token' }), 100)));
+    renderWithProviders(<Login />);
+    await user.type(screen.getByLabelText(/email/i), 'test@example.com');
+    await user.type(screen.getByLabelText(/password/i), 'testpass123');
+    await user.click(screen.getByRole('button', { name: /login/i }));
+    expect(screen.getByRole('button', { name: /login/i })).toBeDisabled();
+    await waitFor(() => expect(screen.getByRole('button', { name: /login/i })).not.toBeDisabled());
   });
 }); 

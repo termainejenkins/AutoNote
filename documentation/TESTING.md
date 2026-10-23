@@ -1,3 +1,5 @@
+> **Legacy (archived).** This document describes the microservices stack archived at tag [`legacy-microservices`](https://github.com/termainejenkins/AutoNote/tree/legacy-microservices) (commit `dc72d42` on `Development--C`). AutoNote v1 is a Chrome extension with no backend. Do not use these steps to run v1.
+
 # Testing Documentation
 
 ## Overview
@@ -85,13 +87,8 @@ chmod +x scripts/test-services.sh
 The test script uses the following test data:
 
 ### User Data
-```json
-{
-    "email": "test@example.com",
-    "password": "testpass123",
-    "username": "testuser"
-}
-```
+
+The archived test script posted a throwaway username and email. The sample password is not copied into this tree. See `backend/test_auth.py` at tag `legacy-microservices` if you need the historical file.
 
 ### Note Data
 ```json

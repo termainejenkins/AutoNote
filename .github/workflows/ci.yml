@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - v1
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Manifest and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Syntax-check extension scripts
+        run: |
+          node --check extension/background.js
+          node --check extension/popup.js
+          node --check extension/options.js
+          node --check extension/gemini.js
+
+      - name: Validate manifest and run unit tests
+        run: node --test

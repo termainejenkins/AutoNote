@@ -1,0 +1,6 @@
+{
+  "name": "autonote-extension",
+  "private": true,
+  "type": "module",
+  "description": "AutoNote Chrome extension source. Not published to npm."
+}

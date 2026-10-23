@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AutoNote options</title>
+    <link rel="stylesheet" href="ui.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <img src="icons/icon32.png" width="32" height="32" alt="" />
+        <h1>AutoNote options</h1>
+      </header>
+      <p>
+        Paste your own Gemini API key. AutoNote stores it with
+        <code>chrome.storage.local</code> on this device only. It is not synced,
+        and it is never written into the repository.
+      </p>
+      <form id="key-form" class="card">
+        <label for="gemini-key">Gemini API key</label>
+        <input
+          id="gemini-key"
+          name="gemini-key"
+          type="password"
+          autocomplete="off"
+          spellcheck="false"
+          aria-describedby="key-help saved-hint"
+        />
+        <p id="key-help">
+          The field is masked. Create a key in
+          <a href="https://aistudio.google.com/apikey">Google AI Studio</a>.
+          Test key sends one small request to Gemini only after you click it.
+          That request asks for a single page of model names. It does not send
+          page content.
+        </p>
+        <p id="saved-hint" class="hint">Checking for a saved key…</p>
+        <div class="actions">
+          <button type="submit" id="save-key">Save key</button>
+          <button type="button" id="test-key">Test key</button>
+          <button type="button" id="clear-key" class="secondary">Remove key</button>
+        </div>
+      </form>
+      <p id="status" role="status" aria-live="polite"></p>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

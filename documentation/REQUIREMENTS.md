@@ -1,3 +1,5 @@
+> **Legacy (archived).** This document describes the microservices stack archived at tag [`legacy-microservices`](https://github.com/termainejenkins/AutoNote/tree/legacy-microservices) (commit `dc72d42` on `Development--C`). AutoNote v1 is a Chrome extension with no backend. Do not use these steps to run v1.
+
 # AutoNote Requirements Document
 
 ## 1. Project Overview

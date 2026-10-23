@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
+  buildGenerateRequest,
   buildKeyTestRequest,
+  generateNote,
   interpretKeyTestResponse,
   normalizeApiKey,
   redactSecret,
@@ -58,4 +60,51 @@ test("sendKeyTest calls fetch once and does not put the key in the URL", async (
   assert.equal(calls[0].init.headers["x-goog-api-key"], SAMPLE_KEY);
   assert.equal(outcome.result.ok, true);
   assert.equal(outcome.result.message.includes(SAMPLE_KEY), false);
+});
+
+test("generateNote posts the prompt once and keeps the key out of the URL and body", async () => {
+  const prompt = "Write a study note about photosynthesis.";
+  const calls = [];
+  const body = JSON.stringify({
+    candidates: [
+      {
+        content: {
+          parts: [
+            {
+              text: JSON.stringify({
+                summary: "Plants store energy.",
+                keyTerms: [],
+                questions: ["One", "Two", "Three"],
+              }),
+            },
+          ],
+        },
+      },
+    ],
+  });
+  const outcome = await generateNote(SAMPLE_KEY, prompt, async (url, init) => {
+    calls.push({ url, init });
+    return { status: 200, text: async () => body };
+  });
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].init.method, "POST");
+  assert.equal(calls[0].url.includes(SAMPLE_KEY), false);
+  assert.equal(calls[0].init.body.includes(SAMPLE_KEY), false);
+  assert.equal(calls[0].init.body.includes(prompt), true);
+  assert.equal(calls[0].init.headers["x-goog-api-key"], SAMPLE_KEY);
+  assert.equal(outcome.result.ok, true);
+  assert.equal(outcome.result.json.summary, "Plants store energy.");
+  assert.equal(outcome.result.message.includes(SAMPLE_KEY), false);
+});
+
+test("a rejected generate call does not echo the response body", async () => {
+  const outcome = await generateNote(SAMPLE_KEY, "Prompt text", async () => ({
+    status: 401,
+    text: async () => `{"error":"${SAMPLE_KEY}"}`,
+  }));
+  assert.equal(outcome.result.ok, false);
+  assert.match(outcome.result.message, /rejected/);
+  assert.equal(outcome.result.message.includes(SAMPLE_KEY), false);
+  assert.throws(() => buildGenerateRequest("  ", "Prompt text"), /Add a Gemini API key/);
 });

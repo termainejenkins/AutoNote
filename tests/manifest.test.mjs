@@ -40,7 +40,13 @@ test("manifest is Manifest V3 JSON with the skeleton contract", () => {
     "tabs",
   ]);
   assert.equal(Object.hasOwn(manifest, "host_permissions"), false);
-  assert.equal(Object.hasOwn(manifest, "content_scripts"), false);
+  assert.deepEqual(manifest.content_scripts, [
+    {
+      matches: ["http://*/*", "https://*/*"],
+      js: ["snapshot.js", "content.js"],
+      run_at: "document_idle",
+    },
+  ]);
 
   const optional = manifest.optional_host_permissions;
   assert.ok(Array.isArray(optional));
@@ -60,6 +66,10 @@ test("manifest is Manifest V3 JSON with the skeleton contract", () => {
     "popup.js",
     "options.js",
     "gemini.js",
+    "notes.html",
+    "notes.js",
+    "content.js",
+    "snapshot.js",
   ]) {
     assert.equal(readText(join("extension", relativePath)).length > 0, true);
   }

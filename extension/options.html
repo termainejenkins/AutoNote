@@ -12,12 +12,30 @@
         <img src="icons/icon32.png" width="32" height="32" alt="" />
         <h1>AutoNote options</h1>
       </header>
-      <p>
-        Paste your own Gemini API key. AutoNote stores it with
-        <code>chrome.storage.local</code> on this device only. It is not synced,
-        and it is never written into the repository.
-      </p>
+
+      <section class="card" aria-labelledby="notice-title">
+        <h2 id="notice-title">Before page text is sent</h2>
+        <p>
+          AutoNote does not send a page to Gemini until you confirm this notice.
+          Auto notes stay off until you turn them on.
+        </p>
+        <ul>
+          <li>Generate note, and auto notes after the time and scroll thresholds, send the page URL, title, headings, and extracted text (up to 12,000 characters).</li>
+          <li>That request goes only to Google Gemini, using the API key stored in Chrome on this device. The key is not synced.</li>
+          <li>Password fields, browser pages, and the default blocklist are skipped: mail, banking, payments, government sites, and checkout, cart, login, or account paths.</li>
+        </ul>
+        <label class="check" for="send-consent">
+          <input id="send-consent" type="checkbox" />
+          I understand page text will be sent to Gemini when I generate a note or when auto notes are on.
+        </label>
+      </section>
+
       <form id="key-form" class="card">
+        <h2>Gemini API key</h2>
+        <p>
+          Paste your own key. AutoNote stores it with
+          <code>chrome.storage.local</code> on this device only. It is never written into the repository.
+        </p>
         <label for="gemini-key">Gemini API key</label>
         <input
           id="gemini-key"
@@ -31,8 +49,7 @@
           The field is masked. Create a key in
           <a href="https://aistudio.google.com/apikey">Google AI Studio</a>.
           Test key sends one small request to Gemini only after you click it.
-          That request asks for a single page of model names. It does not send
-          page content.
+          That request asks for a single page of model names. It does not send page content.
         </p>
         <p id="saved-hint" class="hint">Checking for a saved key…</p>
         <div class="actions">
@@ -41,6 +58,45 @@
           <button type="button" id="clear-key" class="secondary">Remove key</button>
         </div>
       </form>
+
+      <section class="card" aria-labelledby="reading-title">
+        <h2 id="reading-title">Reading and auto notes</h2>
+        <p>
+          Defaults are Study 45 seconds and 60% scroll, Skim 20 seconds and 40% scroll.
+          Time counts only while the tab is visible and you have moved the mouse, scrolled, or typed in the last minute.
+          A short page that does not scroll counts as fully scrolled.
+        </p>
+        <label class="check" for="auto-enabled">
+          <input id="auto-enabled" type="checkbox" />
+          Turn on auto notes
+        </label>
+        <p class="hint">
+          Off by default. When on, Chrome asks permission to read http and https pages, and one note is saved per page per day after the threshold. Turning this off removes that site access.
+        </p>
+        <label for="note-style">Note style</label>
+        <select id="note-style">
+          <option value="study">Study (summary, key terms, 3 questions)</option>
+          <option value="skim">Skim (2–3 sentences and takeaways)</option>
+        </select>
+        <div class="grid">
+          <label for="study-seconds">Study seconds
+            <input id="study-seconds" type="number" min="10" max="600" />
+          </label>
+          <label for="study-scroll">Study scroll %
+            <input id="study-scroll" type="number" min="10" max="100" />
+          </label>
+          <label for="skim-seconds">Skim seconds
+            <input id="skim-seconds" type="number" min="5" max="600" />
+          </label>
+          <label for="skim-scroll">Skim scroll %
+            <input id="skim-scroll" type="number" min="10" max="100" />
+          </label>
+        </div>
+        <div class="actions">
+          <button type="button" id="save-reading">Save reading settings</button>
+        </div>
+      </section>
+
       <p id="status" role="status" aria-live="polite"></p>
     </main>
     <script type="module" src="options.js"></script>

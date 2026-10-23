@@ -9,16 +9,20 @@ The repository is public so the work can be reviewed. Public visibility is not a
 
 ## What AutoNote v1 is
 
-AutoNote v1 is a Chrome extension that takes notes while you read. There is no AutoNote backend, account, or hosted database. Each person supplies their own Gemini API key. The key and, in later v1 work, the notes stay in Chrome on that person's device.
+AutoNote v1 is a Chrome extension that takes notes while you read. There is no AutoNote backend, account, or hosted database. Each person supplies their own Gemini API key. The key and the notes stay in Chrome on that person's device (`chrome.storage.local`).
 
-This branch is the extension skeleton:
+This build can:
 
-- Manifest V3 popup, options page, and background service worker
-- A masked Gemini API key field on the options page
-- A **Test key** button that contacts Gemini only after a click
-- Placeholder toolbar icons
+- Extract readable text from an article, or from `main` when there is no article, and skip password fields, browser pages, and a default blocklist (mail, banking, payments, government, checkout, cart, login, and account paths)
+- Track visible time and scroll depth, with Study defaults of 45 seconds and 60% scroll and Skim defaults of 20 seconds and 40% scroll
+- Write a Study note (summary, key terms, three questions) or a Skim note (two or three sentences and takeaways) through Gemini
+- Keep notes on this device, grouped by site and the first one or two path segments
+- Show the current page in the popup and generate a note when you click
+- Open a notes page with Markdown copy and download
 
-Reading detection, note generation, topic grouping, the notes viewer, and privacy lists are not in this skeleton yet. See [What this change leaves for later](#what-this-change-leaves-for-later).
+Auto notes are off until you turn them on. Nothing on a page is sent until you confirm the notice in options.
+
+The extractor is a small heuristic, not Mozilla Readability. It prefers `article`, then `main`, then the page body, drops scripts, styles, nav, footer, and forms, and caps the text at 12,000 characters.
 
 ## Load the extension unpacked
 
@@ -33,16 +37,24 @@ Reading detection, note generation, topic grouping, the notes viewer, and privac
 
 Chrome reads `extension/manifest.json` directly. There is no build step.
 
-## Add a Gemini API key
+## Try it with your own Gemini key
 
-1. Create a key in [Google AI Studio](https://aistudio.google.com/apikey). AutoNote does not ship a key.
-2. Open the popup and click **Gemini key settings**, or open **Extension options** from `chrome://extensions`.
-3. Paste the key into **Gemini API key**. The field is masked (`type="password"`).
-4. Click **Save key**. Chrome stores it with `chrome.storage.local` on this device. It is not synced to your Google account, and nothing in the extension writes it to disk in this repository.
-5. Click **Test key** when you want to check it. That click is the only time this skeleton talks to Gemini. It sends one small `GET` for a single page of model names, using the `x-goog-api-key` header. It does not send page content. The first click also asks Chrome for permission to contact `generativelanguage.googleapis.com` only.
-6. Click **Remove key** to delete the saved key from this device.
+AutoNote does not ship a key. Do not commit a key, paste it into an issue, or put it in a tracked `.env` file.
 
-Do not commit a key, paste it into an issue, or put it in a tracked `.env` file. `.gitignore` ignores `.env` and `.venv/`.
+1. Create a key in [Google AI Studio](https://aistudio.google.com/apikey).
+2. In Chrome, open the AutoNote popup and click **Options** (or open **Extension options** from `chrome://extensions`).
+3. Read **Before page text is sent**. Check **I understand page text will be sent to Gemini** if you want Generate note or auto notes to work. Leave **Turn on auto notes** unchecked for the first try.
+4. Paste the key into **Gemini API key**. The field is masked. Click **Save key**. The field is cleared; the key stays in `chrome.storage.local` on this device and is not synced.
+5. Optional: click **Test key**. That click sends one small request that lists a single page of model names. It does not send page content. The first test also asks Chrome for permission to contact `generativelanguage.googleapis.com`.
+6. Open a normal article, such as a Wikipedia page or a docs page. Do not use a mail, bank, government, checkout, or login page; those are skipped.
+7. Open the AutoNote popup. It should name the page and say how many characters Generate note would send. Auto notes should say they are off.
+8. Choose **Study** or **Skim**, then click **Generate note**. The popup says it is sending that character count before the request goes out. A successful note says it was saved on this device.
+9. Click **My notes**. The page is grouped under the site and the first part of the path. Use **Copy topic as Markdown** or **Download topic**. The file has a heading per page and a source link on each note. **Delete note** removes it from this device only.
+10. Optional auto mode: in options, confirm the notice, check **Turn on auto notes**, and click **Save reading settings**. Chrome asks for permission to read http and https pages. Leave a docs page open and scrolled until the popup's Auto line passes the time and scroll threshold. One note is saved for that URL per day. **Pause auto for 1 hour** in the popup stops that without deleting the key. Turning auto notes off removes the broad site permission.
+
+You can change the Study and Skim seconds and scroll percent in options before saving reading settings. Time counts only while the tab is visible and you have moved the pointer, scrolled, or typed within the last minute. A page that does not scroll counts as fully scrolled.
+
+Click **Remove key** to delete the saved key from this device. Notes are kept until you delete them.
 
 ## Placeholder icons
 
@@ -73,20 +85,16 @@ node --test
 
 GitHub Actions runs that command, plus a syntax check of the extension scripts, on pull requests and on pushes to `v1` and `main`. The workflow does not deploy and does not use secrets.
 
-## What this change leaves for later
+## What is still later
 
-Later v1 work, not this skeleton:
+Not in this build:
 
-- Readable-text extraction and skipping sensitive pages
-- Passive read detection (time visible and scroll depth)
-- Study and Skim notes through Gemini
-- A local note store and topic grouping
-- The full popup (mode, pause, badge) and a Markdown notes viewer
-- Allowlist, blocklist, and a log of what was sent to the AI
+- An editable blocklist, an "only these sites" allowlist, and a log of what was sent to the AI
+- Research mode, video or PDF capture, and Google Docs or Notion export
 - A packed-extension CI artifact and a demo video
-- Google Docs export
+- Firefox, Safari, and a Chrome Web Store listing
 
-Out of scope for v1: a hosted proxy, accounts, the old microservices, Notion export, Research mode, video or PDF capture, other browsers, and a Chrome Web Store listing.
+Out of scope for v1: a hosted proxy, accounts, and the archived microservices stack.
 
 ## Proprietary notice
 

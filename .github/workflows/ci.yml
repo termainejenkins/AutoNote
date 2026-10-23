@@ -25,10 +25,9 @@ jobs:
 
       - name: Syntax-check extension scripts
         run: |
-          node --check extension/background.js
-          node --check extension/popup.js
-          node --check extension/options.js
-          node --check extension/gemini.js
+          for file in extension/*.js; do
+            node --check "$file"
+          done
 
       - name: Validate manifest and run unit tests
         run: node --test

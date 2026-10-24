@@ -1,3 +1,5 @@
+import { normalizeAllowlist, normalizeBlocklist } from "./privacy.js";
+
 export const SETTINGS_KEY = "autonoteSettings";
 
 export const DEFAULT_SETTINGS = {
@@ -9,6 +11,9 @@ export const DEFAULT_SETTINGS = {
   studyScrollPercent: 60,
   skimSeconds: 20,
   skimScrollPercent: 40,
+  blocklist: [],
+  allowlistEnabled: false,
+  allowlist: [],
 };
 
 function clampInt(value, fallback, min, max) {
@@ -39,6 +44,9 @@ export function normalizeSettings(value) {
       10,
       100,
     ),
+    blocklist: normalizeBlocklist(source.blocklist),
+    allowlistEnabled: source.allowlistEnabled === true,
+    allowlist: normalizeAllowlist(source.allowlist),
   };
 }
 

@@ -1,19 +1,6 @@
+import { builtinBlockReason } from "./privacy.js";
+
 export const TEXT_LIMIT = 12000;
-
-const BLOCKED_HOST_SUFFIXES = [
-  "mail.google.com",
-  "outlook.live.com",
-  "outlook.office.com",
-  "outlook.office365.com",
-  "mail.yahoo.com",
-  "accounts.google.com",
-  "paypal.com",
-  "chase.com",
-  "bankofamerica.com",
-  "wellsfargo.com",
-];
-
-const BLOCKED_SEGMENTS = ["checkout", "cart", "signin", "login", "account"];
 
 const BLOCKED_PROTOCOLS = new Set([
   "chrome:",
@@ -30,14 +17,6 @@ function htmlHasPassword(html) {
   return /<input\b[^>]*\btype\s*=\s*(?:"password"|'password'|password\b)[^>]*>/i.test(
     html,
   );
-}
-
-function pathHasSegment(pathname, segment) {
-  return pathname
-    .toLowerCase()
-    .split("/")
-    .filter(Boolean)
-    .includes(segment);
 }
 
 export function skipReason({ url, hasPassword = false, html = "" }) {
@@ -58,21 +37,7 @@ export function skipReason({ url, hasPassword = false, html = "" }) {
     return "Pages with a password field are skipped.";
   }
 
-  const host = parsed.hostname.toLowerCase();
-  if (host === "gov" || host.endsWith(".gov") || host.endsWith(".gov.uk")) {
-    return "Government sites are on the default blocklist.";
-  }
-  for (const suffix of BLOCKED_HOST_SUFFIXES) {
-    if (host === suffix || host.endsWith(`.${suffix}`)) {
-      return "This site is on the default blocklist (mail, banking, or payments).";
-    }
-  }
-  for (const segment of BLOCKED_SEGMENTS) {
-    if (pathHasSegment(parsed.pathname, segment)) {
-      return "Checkout, cart, login, and account pages are skipped.";
-    }
-  }
-  return "";
+  return builtinBlockReason(url);
 }
 
 function stripNoise(html) {

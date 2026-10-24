@@ -1,4 +1,5 @@
 import { extractPage } from "./extract.js";
+import { gatePage } from "./privacy.js";
 import { isPaused, mergeSettings, ruleFor } from "./settings.js";
 import { readKey, readNotes, readReading, readSettings, writeSettings } from "./storage-io.js";
 import { alreadyNoted, localDay } from "./store.js";
@@ -11,8 +12,13 @@ function setStatus(message) {
   byId("status").textContent = message;
 }
 
-async function collectSnapshot() {
+async function activeTab() {
   const [tab] = await globalThis.chrome.tabs.query({ active: true, currentWindow: true });
+  return tab || null;
+}
+
+async function collectSnapshot() {
+  const tab = await activeTab();
   if (!tab?.id) return { tab: null, snapshot: null };
   try {
     const reply = await globalThis.chrome.tabs.sendMessage(tab.id, { type: "snapshot" });
@@ -56,6 +62,17 @@ async function render() {
     ? "Resume auto notes"
     : "Pause auto for 1 hour";
 
+  const tab = await activeTab();
+  if (tab?.url) {
+    const gate = gatePage(tab.url, settings);
+    if (!gate.ok) {
+      byId("page-title").textContent = tab.title || "This page";
+      byId("page-status").textContent = gate.message;
+      byId("progress").textContent = "Nothing on this page is sent to Gemini.";
+      return;
+    }
+  }
+
   const collected = await collectSnapshot();
   const snapshot = collected.snapshot;
   const extraction = snapshot
@@ -86,6 +103,14 @@ async function onGenerate() {
   button.disabled = true;
   try {
     const settings = await readSettings();
+    const tab = await activeTab();
+    if (tab?.url) {
+      const gate = gatePage(tab.url, settings);
+      if (!gate.ok) {
+        setStatus(gate.message);
+        return;
+      }
+    }
     if (!settings.sendConsent) {
       setStatus("Open options and confirm the notice before AutoNote can send page text to Gemini.");
       return;
@@ -102,6 +127,11 @@ async function onGenerate() {
     const extraction = extractPage(collected.snapshot);
     if (extraction.status !== "ok") {
       setStatus(extraction.reason);
+      return;
+    }
+    const gate = gatePage(extraction.url, settings);
+    if (!gate.ok) {
+      setStatus(gate.message);
       return;
     }
     const mode = byId("note-style").value === "skim" ? "skim" : "study";

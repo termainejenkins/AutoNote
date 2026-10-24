@@ -50,6 +50,6 @@ logs/
 *.crx
 web-ext-artifacts/
 
-# Build output
+# Build output. dist/ holds autonote-extension-*.zip from scripts/package-extension.mjs.
 dist/
 build/

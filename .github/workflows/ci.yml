@@ -14,6 +14,9 @@ jobs:
   check:
     name: Manifest and unit tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,6 +31,24 @@ jobs:
           for file in extension/*.js; do
             node --check "$file"
           done
+          node --check scripts/package-extension.mjs
 
       - name: Validate manifest and run unit tests
         run: node --test
+
+      - name: Package and validate extension zip
+        id: package
+        run: node scripts/package-extension.mjs
+
+      - name: Upload extension zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package.outputs.artifact }}
+          # The script writes dist/<artifact>.zip (manifest at the zip root) and
+          # extracts that validated archive to dist/<artifact>/. Actions stores
+          # every artifact as a zip, so uploading the files makes the download
+          # unzip once to the folder Chrome loads. Uploading the .zip file would
+          # nest a second zip inside the download.
+          path: ${{ steps.package.outputs.stage }}
+          retention-days: 14
+          if-no-files-found: error

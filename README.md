@@ -37,6 +37,17 @@ The extractor is a small heuristic, not Mozilla Readability. It prefers `article
 
 Chrome reads `extension/manifest.json` directly. There is no build step.
 
+## Download a build
+
+You can load AutoNote without cloning.
+
+1. Open the [Actions](https://github.com/termainejenkins/AutoNote/actions) run for the pull request, or for the push to `v1` or `main`.
+2. Under **Artifacts**, download `autonote-extension-<version>-<short sha>`. The version is `version` in `manifest.json`. The short sha is the first seven characters of that run's commit.
+3. Unzip the download.
+4. Open `chrome://extensions`, turn on **Developer mode**, and click **Load unpacked**. Choose the unzipped folder, the one that contains `manifest.json`.
+
+The artifact is kept for 14 days. The workflow does not publish a release or deploy.
+
 ## Try it with your own Gemini key
 
 AutoNote does not ship a key. Do not commit a key, paste it into an issue, or put it in a tracked `.env` file.
@@ -83,7 +94,13 @@ Unit tests use Node's built-in test runner. From the repository root:
 node --test
 ```
 
-GitHub Actions runs that command, plus a syntax check of the extension scripts, on pull requests and on pushes to `v1` and `main`. The workflow does not deploy and does not use secrets.
+GitHub Actions runs that command, plus a syntax check of the extension scripts, on pull requests and on pushes to `v1` and `main`. When those pass, it zips `extension/` and uploads the package as an artifact kept for 14 days. See [Download a build](#download-a-build). To build the same zip locally:
+
+```bash
+node scripts/package-extension.mjs
+```
+
+That writes `dist/autonote-extension-<version>-<short sha>.zip` and fails if `manifest.json` is missing from the zip root or a file the manifest references is not in the archive. The workflow does not deploy and does not use secrets.
 
 ## What is still later
 
@@ -91,7 +108,7 @@ Not in this build:
 
 - An editable blocklist, an "only these sites" allowlist, and a log of what was sent to the AI
 - Research mode, video or PDF capture, and Google Docs or Notion export
-- A packed-extension CI artifact and a demo video
+- A demo video
 - Firefox, Safari, and a Chrome Web Store listing
 
 Out of scope for v1: a hosted proxy, accounts, and the archived microservices stack.

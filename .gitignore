@@ -50,6 +50,11 @@ logs/
 *.crx
 web-ext-artifacts/
 
+# Playwright end-to-end output
+test-results/
+playwright-report/
+blob-report/
+
 # Build output. dist/ holds autonote-extension-*.zip from scripts/package-extension.mjs.
 dist/
 build/

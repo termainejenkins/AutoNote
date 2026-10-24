@@ -1,0 +1,13 @@
+{
+  "name": "autonote",
+  "private": true,
+  "type": "module",
+  "description": "Development scripts for AutoNote. The extension in extension/ ships with no dependencies.",
+  "scripts": {
+    "test": "node --test",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}

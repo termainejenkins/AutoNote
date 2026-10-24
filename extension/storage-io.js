@@ -1,5 +1,6 @@
 import { STORAGE_KEY } from "./gemini.js";
 import { readingStorageKey } from "./read-state.js";
+import { sanitizeSendLog, SEND_LOG_KEY } from "./send-log.js";
 import { normalizeSettings, SETTINGS_KEY } from "./settings.js";
 import { NOTES_KEY } from "./store.js";
 
@@ -49,4 +50,19 @@ export async function writeReading(tabId, state) {
 
 export async function removeReading(tabId) {
   await globalThis.chrome.storage.session.remove(readingStorageKey(tabId));
+}
+
+export async function readSendLog() {
+  const stored = await globalThis.chrome.storage.local.get(SEND_LOG_KEY);
+  return sanitizeSendLog(stored[SEND_LOG_KEY]);
+}
+
+export async function writeSendLog(entries) {
+  const safe = sanitizeSendLog(entries);
+  await globalThis.chrome.storage.local.set({ [SEND_LOG_KEY]: safe });
+  return safe;
+}
+
+export async function clearSendLog() {
+  await globalThis.chrome.storage.local.set({ [SEND_LOG_KEY]: [] });
 }

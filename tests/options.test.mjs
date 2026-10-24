@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { GEMINI_ORIGIN, STORAGE_KEY } from "../extension/gemini.js";
+import { SEND_LOG_KEY } from "../extension/send-log.js";
 
 function element() {
   return {
@@ -90,6 +91,13 @@ test("options page does not contact Gemini until Test key is clicked", async () 
   assert.match(elements.get("status").textContent, /Key works/);
   assert.equal(elements.get("status").textContent.includes("unit-test-key"), false);
   assert.equal(elements.get("test-key").disabled, false);
+  const sendLog = storage.get(SEND_LOG_KEY);
+  assert.equal(sendLog.length, 1);
+  assert.equal(sendLog[0].mode, "key-test");
+  assert.equal(sendLog[0].url, "");
+  assert.equal(sendLog[0].title, "");
+  assert.equal(sendLog[0].ok, true);
+  assert.equal(JSON.stringify(sendLog).includes("unit-test-key"), false);
 
   await elements.get("key-form").listeners.submit({
     preventDefault() {},

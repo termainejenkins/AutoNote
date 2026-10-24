@@ -13,12 +13,13 @@ AutoNote v1 is a Chrome extension that takes notes while you read. There is no A
 
 This build can:
 
-- Extract readable text from an article, or from `main` when there is no article, and skip password fields, browser pages, and a default blocklist (mail, banking, payments, government, checkout, cart, login, and account paths)
+- Extract readable text from an article, or from `main` when there is no article, and skip password fields, browser pages, and a default blocklist (mail, banking, payments, government, checkout, cart, login, and account paths). You can add your own block rules, and optionally limit notes to an allowlist of domains
 - Track visible time and scroll depth, with Study defaults of 45 seconds and 60% scroll and Skim defaults of 20 seconds and 40% scroll
 - Write a Study note (summary, key terms, three questions) or a Skim note (two or three sentences and takeaways) through Gemini
 - Keep notes on this device, grouped by site and the first one or two path segments
 - Show the current page in the popup and generate a note when you click
 - Open a notes page with Markdown copy and download
+- Keep a local log of Gemini requests (time, URL, title, Study or Skim, character count, and success or error) without the page text or the key
 
 Auto notes are off until you turn them on. Nothing on a page is sent until you confirm the notice in options.
 
@@ -46,7 +47,7 @@ AutoNote does not ship a key. Do not commit a key, paste it into an issue, or pu
 3. Read **Before page text is sent**. Check **I understand page text will be sent to Gemini** if you want Generate note or auto notes to work. Leave **Turn on auto notes** unchecked for the first try.
 4. Paste the key into **Gemini API key**. The field is masked. Click **Save key**. The field is cleared; the key stays in `chrome.storage.local` on this device and is not synced.
 5. Optional: click **Test key**. That click sends one small request that lists a single page of model names. It does not send page content. The first test also asks Chrome for permission to contact `generativelanguage.googleapis.com`.
-6. Open a normal article, such as a Wikipedia page or a docs page. Do not use a mail, bank, government, checkout, or login page; those are skipped.
+6. Open a normal article, such as a Wikipedia page or a docs page. Do not use a mail, bank, government, checkout, or login page; those are skipped. Your own blocklist and the optional only-these-sites list are described under Privacy controls in options.
 7. Open the AutoNote popup. It should name the page and say how many characters Generate note would send. Auto notes should say they are off.
 8. Choose **Study** or **Skim**, then click **Generate note**. The popup says it is sending that character count before the request goes out. A successful note says it was saved on this device.
 9. Click **My notes**. The page is grouped under the site and the first part of the path. Use **Copy topic as Markdown** or **Download topic**. The file has a heading per page and a source link on each note. **Delete note** removes it from this device only.
@@ -55,6 +56,15 @@ AutoNote does not ship a key. Do not commit a key, paste it into an issue, or pu
 You can change the Study and Skim seconds and scroll percent in options before saving reading settings. Time counts only while the tab is visible and you have moved the pointer, scrolled, or typed within the last minute. A page that does not scroll counts as fully scrolled.
 
 Click **Remove key** to delete the saved key from this device. Notes are kept until you delete them.
+
+## Privacy controls in options
+
+Open **Options** to review sites and the send log. These controls do not change the defaults: auto notes stay off, the send notice stays unchecked, and the built-in blocklist stays on.
+
+- **Built-in blocklist.** Mail, banking, payments, government, checkout, cart, login, and account paths are listed under Built-in rules. They are always on and cannot be removed. A blocked page never sends text, from Generate note or from auto notes. The popup says why.
+- **Your blocklist.** Add or remove your own domains or URL patterns. `example.com` also matches subdomains such as `notes.example.com`. A path pattern such as `/billing` matches that path segment. `shop.example.com/private` matches that host and path. Removing a rule only removes one you added.
+- **Only these sites.** Off by default, which keeps the previous behaviour: any site that is not blocked can be noted. When the checkbox is on, auto notes and Generate note run only on the domains you list, including their subdomains. The blocklist still wins. With the checkbox on and no domains listed, nothing is sent.
+- **What was sent to Gemini.** Each Gemini request is stored in `chrome.storage.local` on this device: time, URL, title, Study or Skim, the extracted character count, and success or error. The page text and the API key are not stored. The list keeps the newest 200 entries. **Test key** is stored as a key test with no URL. **Clear log** deletes the list from this device.
 
 ## Placeholder icons
 
@@ -89,7 +99,6 @@ GitHub Actions runs that command, plus a syntax check of the extension scripts, 
 
 Not in this build:
 
-- An editable blocklist, an "only these sites" allowlist, and a log of what was sent to the AI
 - Research mode, video or PDF capture, and Google Docs or Notion export
 - A packed-extension CI artifact and a demo video
 - Firefox, Safari, and a Chrome Web Store listing

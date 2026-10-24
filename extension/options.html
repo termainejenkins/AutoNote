@@ -22,7 +22,9 @@
         <ul>
           <li>Generate note, and auto notes after the time and scroll thresholds, send the page URL, title, headings, and extracted text (up to 12,000 characters).</li>
           <li>That request goes only to Google Gemini, using the API key stored in Chrome on this device. The key is not synced.</li>
-          <li>Password fields, browser pages, and the default blocklist are skipped: mail, banking, payments, government sites, and checkout, cart, login, or account paths.</li>
+          <li>Password fields, browser pages, and the blocklist are skipped. Built-in rules cover mail, banking, payments, government sites, and checkout, cart, login, or account paths. Rules you add are extra. They cannot turn the built-in ones off.</li>
+          <li>If "Only take notes on these sites" is on, Generate note and auto notes run only on the domains you list.</li>
+          <li>A log on this page records each Gemini request without the page text or the API key.</li>
         </ul>
         <label class="check" for="send-consent">
           <input id="send-consent" type="checkbox" />
@@ -94,6 +96,62 @@
         </div>
         <div class="actions">
           <button type="button" id="save-reading">Save reading settings</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="privacy-title">
+        <h2 id="privacy-title">Sites</h2>
+        <h3>Built-in rules</h3>
+        <p>
+          These rules are always on. You can read them here. They cannot be removed.
+          A matching page never sends text, from Generate note or from auto notes. The popup says why.
+        </p>
+        <ul id="builtin-rules" class="rules"></ul>
+
+        <h3>Your blocklist</h3>
+        <p>
+          Add a domain or a URL pattern. <code>example.com</code> also matches subdomains.
+          <code>/billing</code> matches that path on any site. <code>shop.example.com/private</code> matches that host and path.
+          Remove only rules you added.
+        </p>
+        <form id="block-form">
+          <label for="block-pattern">Domain or URL pattern</label>
+          <input id="block-pattern" type="text" autocomplete="off" spellcheck="false" placeholder="notes.example.com or /billing" />
+          <div class="actions">
+            <button type="submit" id="add-block">Add to blocklist</button>
+          </div>
+        </form>
+        <ul id="user-block-rules" class="rules"></ul>
+
+        <h3>Only these sites</h3>
+        <label class="check" for="allowlist-enabled">
+          <input id="allowlist-enabled" type="checkbox" />
+          Only take notes on these sites
+        </label>
+        <p class="hint">
+          Off by default. When this is on, auto notes and Generate note run only on the domains listed here, including their subdomains. The blocklist still applies.
+        </p>
+        <form id="allow-form">
+          <label for="allow-domain">Domain</label>
+          <input id="allow-domain" type="text" autocomplete="off" spellcheck="false" placeholder="docs.example.com" />
+          <div class="actions">
+            <button type="submit" id="add-allow">Add domain</button>
+          </div>
+        </form>
+        <ul id="allow-rules" class="rules"></ul>
+      </section>
+
+      <section class="card" aria-labelledby="log-title">
+        <h2 id="log-title">What was sent to Gemini</h2>
+        <p>
+          Each request is stored in <code>chrome.storage.local</code> on this device.
+          The log records time, URL, title, Study or Skim, character count, and success or error.
+          It does not store the page text or your API key. Test key is stored as a key test with no URL.
+          The newest 200 entries are kept.
+        </p>
+        <div id="send-log"></div>
+        <div class="actions">
+          <button type="button" id="clear-log" class="secondary">Clear log</button>
         </div>
       </section>
 

@@ -203,3 +203,27 @@ article + article {
   padding-top: 12px;
   border-top: 1px solid var(--line);
 }
+
+.rules,
+.log-list {
+  list-style: none;
+  padding: 0;
+}
+
+.rules li,
+.log-list li {
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+
+.rules li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+body.popup p {
+  overflow-wrap: anywhere;
+}

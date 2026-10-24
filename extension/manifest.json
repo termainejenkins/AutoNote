@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "AutoNote",
-  "version": "0.1.0",
-  "description": "Takes notes while you read. You supply your own Gemini API key. This build is the v1 skeleton.",
+  "version": "0.2.0",
+  "description": "Takes notes while you read. You supply your own Gemini API key. Notes stay on this device.",
   "permissions": ["storage", "scripting", "activeTab", "tabs"],
   "optional_host_permissions": [
     "https://generativelanguage.googleapis.com/*",
@@ -27,6 +27,13 @@
     "page": "options.html",
     "open_in_tab": true
   },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["snapshot.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",

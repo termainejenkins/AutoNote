@@ -94,7 +94,17 @@ Unit tests use Node's built-in test runner. From the repository root:
 node --test
 ```
 
-GitHub Actions runs that command, plus a syntax check of the extension scripts, on pull requests and on pushes to `v1` and `main`. When those pass, it zips `extension/` and uploads the package as an artifact kept for 14 days. See [Download a build](#download-a-build). To build the same zip locally:
+End-to-end tests launch Chromium with the unpacked extension and answer Gemini with canned responses. They do not use a real API key. Install Playwright's Chromium, then run:
+
+```bash
+npm ci
+npx playwright install chromium
+npm run test:e2e
+```
+
+`npm run test:e2e` needs a display. GitHub Actions starts that display with `xvfb`. `node --test` does not collect the end-to-end files.
+
+GitHub Actions runs the unit tests, a syntax check of the extension scripts, and the end-to-end job on pull requests and on pushes to `v1` and `main`. When the unit tests pass, it zips `extension/` and uploads the package as an artifact kept for 14 days. See [Download a build](#download-a-build). To build the same zip locally:
 
 ```bash
 node scripts/package-extension.mjs

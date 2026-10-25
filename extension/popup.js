@@ -144,17 +144,6 @@ async function onGenerate() {
       mode,
       snapshot: collected.snapshot,
     });
-    if (response?.ok && collected.tab?.id != null) {
-      try {
-        await globalThis.chrome.action.setBadgeText({ tabId: collected.tab.id, text: "OK" });
-        await globalThis.chrome.action.setBadgeBackgroundColor({
-          tabId: collected.tab.id,
-          color: "#1f4b4a",
-        });
-      } catch {
-        // The note is already saved if the badge cannot be updated.
-      }
-    }
     await render().catch(() => {});
     setStatus(response?.message || "AutoNote did not answer.");
   } catch {

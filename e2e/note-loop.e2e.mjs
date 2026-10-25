@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
 
+import { SESSION_COUNT_KEY } from "../extension/session-count.js";
+
 import {
   assertKeyOnlyInHeader,
   articleHtml,
@@ -127,6 +129,10 @@ test("popup shows the article title and character count", async () => {
   expect(count).toBeLessThanOrEqual(12000);
   expect(status).toContain(`${count} characters`);
   expect(calls.filter((call) => call.method === "POST")).toHaveLength(0);
+  const badge = await sessionBadge();
+  expect(badge.text).toBe("");
+  expect(badge.count).toBe(0);
+  expect(badge.title).toBe("AutoNote: 0 notes this session");
   await popup.close();
   await article.close();
 });
@@ -156,6 +162,11 @@ test("generates a Study note and stores it on this device", async () => {
   expect(notes[0].topicKey).toBe("127.0.0.1/guides/biology");
   expect(notes[0].markdown).toContain("Plants store light as chemical energy in glucose.");
   expect(notes[0].markdown).toContain("Chlorophyll");
+  const badge = await sessionBadge();
+  expect(badge.text).toBe("1");
+  expect(badge.title).toBe("AutoNote: 1 note this session");
+  expect(badge.count).toBe(1);
+  expect(JSON.stringify(badge.stored).includes(DUMMY_KEY)).toBe(false);
 
   await popup.screenshot(path.join(shots, "popup-generated-note.png"));
   await popup.close();
@@ -286,6 +297,10 @@ test("auto mode saves one note for a URL per day", async () => {
 
   const saved = (await readStorage(session.worker)).autonoteNotes.filter((note) => note.url === autoUrl);
   expect(saved).toHaveLength(1);
+  const badge = await sessionBadge();
+  expect(badge.text).toBe("3");
+  expect(badge.title).toBe("AutoNote: 3 notes this session");
+  expect(badge.count).toBe(3);
 
   await article.goto(loginUrl);
   await article.goto(autoUrl);
@@ -334,6 +349,18 @@ async function openOptions() {
   await page.goto(`chrome-extension://${session.extensionId}/options.html`);
   await page.locator("#gemini-key").waitFor();
   return page;
+}
+
+async function sessionBadge() {
+  return session.worker.evaluate(async (key) => {
+    const stored = await chrome.storage.session.get(key);
+    return {
+      text: await chrome.action.getBadgeText({}),
+      title: await chrome.action.getTitle({}),
+      count: typeof stored[key] === "number" ? stored[key] : 0,
+      stored,
+    };
+  }, SESSION_COUNT_KEY);
 }
 
 async function readingState(url) {

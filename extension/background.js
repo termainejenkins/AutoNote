@@ -17,6 +17,13 @@ import {
   writeReading,
   writeSendLog,
 } from "./storage-io.js";
+import {
+  BADGE_COLOR,
+  SESSION_COUNT_KEY,
+  incrementSessionCount,
+  loadSessionCount,
+  sessionBadgeUpdate,
+} from "./session-count.js";
 import { addNote, alreadyNoted, createNote, localDay } from "./store.js";
 
 console.info("AutoNote service worker started");
@@ -41,6 +48,44 @@ function recordSend(details) {
 }
 
 const QUIET_CODES = new Set(["duplicate", "paused", "auto-off"]);
+
+let sessionCountWrite = Promise.resolve();
+
+async function readSessionCount() {
+  const stored = await globalThis.chrome.storage.session.get(SESSION_COUNT_KEY);
+  return loadSessionCount(stored);
+}
+
+async function showSessionBadge(count) {
+  const update = sessionBadgeUpdate(count);
+  try {
+    await globalThis.chrome.action.setBadgeText({ text: update.text });
+    await globalThis.chrome.action.setBadgeBackgroundColor({ color: update.color });
+    await globalThis.chrome.action.setTitle({ title: update.title });
+  } catch {
+    // The badge is a hint. A failed update does not change the saved note.
+  }
+}
+
+function recordSessionNote() {
+  const run = sessionCountWrite.then(async () => {
+    const next = incrementSessionCount(await readSessionCount());
+    await globalThis.chrome.storage.session.set({ [SESSION_COUNT_KEY]: next });
+    await showSessionBadge(next);
+  });
+  sessionCountWrite = run.catch(() => {});
+  return sessionCountWrite;
+}
+
+function restoreSessionBadge() {
+  const run = sessionCountWrite.then(async () => {
+    await showSessionBadge(await readSessionCount());
+  });
+  sessionCountWrite = run.catch(() => {});
+  return sessionCountWrite;
+}
+
+restoreSessionBadge();
 
 function enqueue(tabId, task) {
   const previous = chains.get(tabId) || Promise.resolve();
@@ -134,6 +179,7 @@ async function createNoteFromSnapshot({ snapshot, mode, manual }) {
   });
   await writeNotes(addNote(notes, note));
   await recordSend({ ...sent, ok: true, error: "" });
+  await recordSessionNote();
   return {
     ok: true,
     code: "saved",
@@ -191,8 +237,14 @@ async function handleTick(message, sender) {
       holdUntil: settled ? 0 : message.now + 60000,
       lastMessage: outcome.message,
     };
-    if (outcome.ok) await showBadge(tabId, "OK");
-    else if (!QUIET_CODES.has(outcome.code)) await showBadge(tabId, "!");
+    if (outcome.ok) {
+      await showBadge(tabId, "");
+      try {
+        await globalThis.chrome.action.setBadgeBackgroundColor({ tabId, color: BADGE_COLOR });
+      } catch {
+        // Clearing the progress badge is enough for the session count to show.
+      }
+    } else if (!QUIET_CODES.has(outcome.code)) await showBadge(tabId, "!");
   } catch {
     state = {
       ...state,

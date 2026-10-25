@@ -184,9 +184,9 @@ export function installGeminiMock(context) {
           ? {
               models: [
                 {
-                  name: "models/gemini-2.5-flash-lite",
+                  name: "models/gemini-3.5-flash-lite",
                   version: "001",
-                  displayName: "Gemini 2.5 Flash-Lite",
+                  displayName: "Gemini 3.5 Flash-Lite",
                   description: "Lightweight model for short notes.",
                   inputTokenLimit: 1048576,
                   outputTokenLimit: 8192,
@@ -210,7 +210,7 @@ export function installGeminiMock(context) {
                 candidatesTokenCount: 96,
                 totalTokenCount: 224,
               },
-              modelVersion: "gemini-2.5-flash-lite",
+              modelVersion: "gemini-3.5-flash-lite",
             },
       ),
     });

@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
+  GEMINI_MODEL,
   buildGenerateRequest,
   buildKeyTestRequest,
   generateNote,
   interpretKeyTestResponse,
   normalizeApiKey,
+  parseGenerateResponse,
   redactSecret,
   sendKeyTest,
 } from "../extension/gemini.js";
@@ -39,6 +41,7 @@ test("interpretKeyTestResponse maps status codes without echoing a body", () => 
   assert.match(interpretKeyTestResponse(403).message, /rejected/);
   assert.match(interpretKeyTestResponse(429).message, /rate-limited/);
   assert.match(interpretKeyTestResponse(500).message, /HTTP 500/);
+  assert.equal(interpretKeyTestResponse(404).message, "Gemini test failed (HTTP 404).");
   assert.equal(interpretKeyTestResponse(401).message.includes(SAMPLE_KEY), false);
 });
 
@@ -90,6 +93,8 @@ test("generateNote posts the prompt once and keeps the key out of the URL and bo
   assert.equal(calls.length, 1);
   assert.equal(calls[0].init.method, "POST");
   assert.equal(calls[0].url.includes(SAMPLE_KEY), false);
+  assert.equal(calls[0].url.includes(`models/${GEMINI_MODEL}:generateContent`), true);
+  assert.equal(GEMINI_MODEL, "gemini-3.5-flash-lite");
   assert.equal(calls[0].init.body.includes(SAMPLE_KEY), false);
   assert.equal(calls[0].init.body.includes(prompt), true);
   assert.equal(calls[0].init.headers["x-goog-api-key"], SAMPLE_KEY);
@@ -107,4 +112,48 @@ test("a rejected generate call does not echo the response body", async () => {
   assert.match(outcome.result.message, /rejected/);
   assert.equal(outcome.result.message.includes(SAMPLE_KEY), false);
   assert.throws(() => buildGenerateRequest("  ", "Prompt text"), /Add a Gemini API key/);
+});
+
+test("buildGenerateRequest keeps the generateContent body and the 3.5 model", () => {
+  const request = buildGenerateRequest(SAMPLE_KEY, "Prompt text");
+  assert.equal(
+    request.url,
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+  );
+  assert.equal(request.url.includes("gemini-2.5-flash-lite"), false);
+  assert.deepEqual(JSON.parse(request.init.body), {
+    contents: [{ role: "user", parts: [{ text: "Prompt text" }] }],
+    generationConfig: {
+      temperature: 0.2,
+      maxOutputTokens: 2048,
+      responseMimeType: "application/json",
+    },
+  });
+});
+
+test("a 404 from note generation says the model may be unavailable and does not echo the body or key", async () => {
+  const leaked = `models/gemini-2.5-flash-lite is not found for ${SAMPLE_KEY}`;
+  let readBody = false;
+  const parsed = parseGenerateResponse(404);
+  assert.equal(parsed.ok, false);
+  assert.equal(
+    parsed.message,
+    "Gemini note failed (HTTP 404). The model may be unavailable for this key.",
+  );
+  assert.equal(parseGenerateResponse(500).message, "Gemini note failed (HTTP 500).");
+  assert.match(parseGenerateResponse(401).message, /rejected/);
+
+  const outcome = await generateNote(SAMPLE_KEY, "Prompt text", async () => ({
+    status: 404,
+    text: async () => {
+      readBody = true;
+      return JSON.stringify({ error: { message: leaked } });
+    },
+  }));
+  assert.equal(outcome.result.ok, false);
+  assert.equal(outcome.result.message, parsed.message);
+  assert.equal(readBody, false);
+  assert.equal(outcome.result.message.includes(SAMPLE_KEY), false);
+  assert.equal(outcome.result.message.includes(leaked), false);
+  assert.equal(outcome.result.message.includes("not found"), false);
 });

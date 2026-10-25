@@ -2,7 +2,7 @@ export const STORAGE_KEY = "geminiApiKey";
 
 export const GEMINI_ORIGIN = "https://generativelanguage.googleapis.com/*";
 
-export const GEMINI_MODEL = "gemini-2.5-flash-lite";
+export const GEMINI_MODEL = "gemini-3.5-flash-lite";
 
 const GEMINI_TEST_URL =
   "https://generativelanguage.googleapis.com/v1beta/models?pageSize=1";
@@ -135,6 +135,12 @@ export function parseGenerateResponse(status) {
     return {
       ok: false,
       message: "Gemini rate-limited the note. Wait a moment and try again.",
+    };
+  }
+  if (status === 404) {
+    return {
+      ok: false,
+      message: "Gemini note failed (HTTP 404). The model may be unavailable for this key.",
     };
   }
   if (status < 200 || status >= 300) {

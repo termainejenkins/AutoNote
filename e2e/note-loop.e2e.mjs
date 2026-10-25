@@ -143,7 +143,7 @@ test("generates a Study note and stores it on this device", async () => {
 
   const post = calls.filter((call) => call.method === "POST");
   expect(post).toHaveLength(1);
-  expect(post[0].url).toContain(":generateContent");
+  expect(post[0].url).toContain("/models/gemini-3.5-flash-lite:generateContent");
   expect(post[0].body).toContain(PHOTO_SENTENCE);
   expect(post[0].body).toContain("Mode: study");
   assertKeyOnlyInHeader(post[0], DUMMY_KEY);

@@ -17,7 +17,7 @@ The model is fixed in `extension/gemini.js` as `gemini-3.5-flash-lite`. The exte
 
 - **Generate note** in the popup, for the active page, as Study or Skim.
 - **Auto notes**, off until you turn them on. After the time and scroll threshold, AutoNote saves one note per page URL per local day. The `#fragment` is ignored, so the same path with a different hash counts as one page.
-- **Notes page** with topics, Markdown copy and download, rename, and delete.
+- **Notes page** with topics, Markdown copy and download, copy for Google Docs, rename, and delete.
 - **Blocklist** for pages that should never be sent, plus an optional "only these sites" list.
 - **Privacy controls**: a send notice you must confirm, and a local log of Gemini calls.
 - **Toolbar badge**: a green count of notes saved during this browser session.
@@ -33,7 +33,7 @@ The extractor is a small heuristic, not Mozilla Readability. It uses `article`, 
 - **Note.** `POST /v1beta/models/gemini-3.5-flash-lite:generateContent`. The message is the note instructions for Study or Skim, the page title, the page URL, the headings, and the extracted text (12,000 characters at most).
 - **Test key.** `GET /v1beta/models?pageSize=1`, and only after you click Test key. That call does not include page content.
 
-Study asks for one summary paragraph, key terms, and three review questions. Skim asks for two or three sentences and three to five short takeaways. The reply is stored as Markdown on this device.
+Study asks for one summary paragraph, key terms, and three review questions. Skim asks for two or three sentences and three to five short takeaways. The reply is stored as Markdown on this device. Copying a note for Google Docs writes the clipboard on this device only. It does not contact Google Docs or Gemini.
 
 **What stays on this device.** `chrome.storage.local` (not synced) holds:
 
@@ -111,7 +111,7 @@ When the threshold is met, AutoNote saves one note for that URL for the local da
 
 Notes are grouped by topic. A topic is the site plus the first one or two path segments (`docs.example.com/course/module/overview` lands in `docs.example.com/course/module`). You can rename a topic on this device.
 
-**Copy topic as Markdown** and **Download topic** write a heading per page and a source link on each note. **Download all notes** exports every topic. **Delete note** asks you to confirm, then removes that note from this device only.
+**Copy topic as Markdown** and **Download topic** write a heading per page and a source link on each note. **Copy for Google Docs** copies one note, or the whole topic, as formatted text you can paste into a Google Doc. That copy stays on this device and is not sent anywhere. **Download all notes** exports every topic. **Delete note** asks you to confirm, then removes that note from this device only.
 
 ### Toolbar badge
 
@@ -166,7 +166,7 @@ CI also syntax-checks `extension/*.js` and `scripts/package-extension.mjs`, then
 
 Files under `documentation/` describe the old microservices stack. Each one is marked legacy. The tag [`legacy-microservices`](https://github.com/termainejenkins/AutoNote/tree/legacy-microservices) points at commit `dc72d42` on `Development--C`. Do not use those documents, Docker Compose, or that tree to run AutoNote v1.
 
-Not in this version: a hosted proxy, accounts, Research mode, video or PDF capture, Google Docs or Notion export, Firefox, Safari, and a Chrome Web Store listing.
+Not in this version: a hosted proxy, accounts, Research mode, video or PDF capture, a Notion integration, Firefox, Safari, and a Chrome Web Store listing.
 
 ## License
 

@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
 
+import { markdownToHtml } from "../extension/markdown-html.js";
 import { SESSION_COUNT_KEY } from "../extension/session-count.js";
 
 import {
@@ -226,6 +227,61 @@ test("notes page groups the topic and markdown copy and download include the hea
   await notes.close();
 });
 
+test("copy for Google Docs writes HTML headings, lists, and the source link", async () => {
+  const notes = await session.context.newPage();
+  await notes.goto(`chrome-extension://${session.extensionId}/notes.html`);
+  await expect(notes.getByRole("heading", { level: 3, name: "Photosynthesis module" })).toBeVisible();
+  const callsBefore = calls.length;
+
+  const photo = notes.locator("article").filter({ hasText: "Photosynthesis module" });
+  await photo.getByRole("button", { name: "Copy for Google Docs" }).click();
+  await expect(notes.locator("#status")).toHaveText("Copied. Paste into Google Docs.");
+  expect(calls).toHaveLength(callsBefore);
+
+  const plain = await notes.evaluate(async () => navigator.clipboard.readText());
+  const html = await readClipboardHtml(notes);
+  const generated = markdownToHtml(plain);
+  expect(plain.startsWith("## Photosynthesis module\n")).toBe(true);
+  expect(plain).toContain(`[Source](${photoUrl})`);
+  expect(plain).toContain("Plants store light as chemical energy in glucose.");
+  expect(plain).toContain("**Chlorophyll:**");
+  expect(plain.includes(DUMMY_KEY)).toBe(false);
+  expect(generated).toContain("<h2>Photosynthesis module</h2>");
+  expect(generated).toContain(`<a href="${photoUrl}">Source</a>`);
+  expect(generated).toContain("<strong>Chlorophyll:</strong>");
+  expect(generated).toContain("<h3>Key terms</h3>");
+  expect(generated).toContain("<li>Where do the light reactions occur?</li>");
+  expect(generated.toLowerCase().includes("javascript:")).toBe(false);
+  expect(html).toContain("<h2>Photosynthesis module</h2>");
+  expect(html).toContain(photoUrl);
+  expect(html).toContain("Chlorophyll");
+  expect(html.toLowerCase().includes("javascript:")).toBe(false);
+  expect(html.includes(DUMMY_KEY)).toBe(false);
+
+  await notes.locator("#status").evaluate((element) => {
+    element.textContent = "";
+  });
+  await notes.locator("section.card > .actions").getByRole("button", { name: "Copy for Google Docs" }).click();
+  await expect(notes.locator("#status")).toHaveText("Copied. Paste into Google Docs.");
+  expect(calls).toHaveLength(callsBefore);
+  const topicPlain = await notes.evaluate(async () => navigator.clipboard.readText());
+  const topicHtml = await readClipboardHtml(notes);
+  const topicGenerated = markdownToHtml(topicPlain);
+  expect(topicPlain.startsWith("# guides / biology\n")).toBe(true);
+  expect(topicPlain).toContain("## Photosynthesis module");
+  expect(topicPlain).toContain("## Respiration module");
+  expect(topicPlain).toContain(`[Source](${photoUrl})`);
+  expect(topicPlain).toContain(`[Source](${respUrl})`);
+  expect(topicGenerated).toContain("<h1>guides / biology</h1>");
+  expect(topicGenerated).toContain(`<a href="${photoUrl}">Source</a>`);
+  expect(topicGenerated).toContain(`<a href="${respUrl}">Source</a>`);
+  expect(topicHtml).toContain("guides / biology");
+  expect(topicHtml).toContain(photoUrl);
+  expect(topicHtml).toContain(respUrl);
+  expect(topicHtml.includes(DUMMY_KEY)).toBe(false);
+  await notes.close();
+});
+
 test("delete note removes it from this device", async () => {
   const notes = await session.context.newPage();
   await notes.goto(`chrome-extension://${session.extensionId}/notes.html`);
@@ -342,6 +398,17 @@ function expectMarkdown(markdown) {
   expect(markdown).toContain("## Respiration module");
   expect(markdown).toContain(`[Source](${respUrl})`);
   expect(markdown.includes(DUMMY_KEY)).toBe(false);
+}
+
+async function readClipboardHtml(page) {
+  return page.evaluate(async () => {
+    const items = await navigator.clipboard.read();
+    for (const item of items) {
+      if (!item.types.includes("text/html")) continue;
+      return await (await item.getType("text/html")).text();
+    }
+    return "";
+  });
 }
 
 async function openOptions() {
